@@ -12,40 +12,32 @@
 <VBox prefHeight="650.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="compiler.CompilerController">
    <MenuBar VBox.vgrow="NEVER">
       <Menu mnemonicParsing="false" text="Arquivo">
-         <MenuItem mnemonicParsing="false" text="New" />
-         <MenuItem mnemonicParsing="false" text="Open…" />
-         <Menu mnemonicParsing="false" text="Open Recent" />
+         <MenuItem mnemonicParsing="false" text="Novo" onAction="#menuBarFileNewOnClick"  />
+         <MenuItem mnemonicParsing="false" text="Abrir..." onAction="#menuBarFileOpenOnClick" />
          <SeparatorMenuItem mnemonicParsing="false" />
-         <MenuItem mnemonicParsing="false" text="Close" />
-         <MenuItem mnemonicParsing="false" text="Save" />
-         <MenuItem mnemonicParsing="false" text="Save As…" />
-         <MenuItem mnemonicParsing="false" text="Revert" />
+         <MenuItem mnemonicParsing="false" text="Fechar" onAction="#menuBarFileCloseOnClick"/>
+         <MenuItem mnemonicParsing="false" text="Salvar" onAction="#menuBarFileSaveOnClick"/>
+         <MenuItem mnemonicParsing="false" text="Salvar Como..." onAction="#menuBarSaveAsNewOnClick"/>
          <SeparatorMenuItem mnemonicParsing="false" />
-         <MenuItem mnemonicParsing="false" text="Preferences…" />
-         <SeparatorMenuItem mnemonicParsing="false" />
-         <MenuItem mnemonicParsing="false" text="Quit" />
+         <MenuItem mnemonicParsing="false" text="Sair" onAction="#menuBarFileExitOnClick" />
       </Menu>
       <Menu mnemonicParsing="false" text="Edição">
-         <MenuItem mnemonicParsing="false" text="Undo" />
-         <MenuItem mnemonicParsing="false" text="Redo" />
+         <MenuItem mnemonicParsing="false" text="Copiar" onAction="#menuBarEditCopyOnClick" />
+         <MenuItem mnemonicParsing="false" text="Colar" onAction="#menuBarEditPasteOnClick"/>
+         <MenuItem mnemonicParsing="false" text="Recortar" onAction="#menuBarEditCutOnClick" />
+         <MenuItem mnemonicParsing="false" text="Deletar" onAction="#menuBarEditDeleteOnClick" />
          <SeparatorMenuItem mnemonicParsing="false" />
-         <MenuItem mnemonicParsing="false" text="Cut" />
-         <MenuItem mnemonicParsing="false" text="Copy" />
-         <MenuItem mnemonicParsing="false" text="Paste" />
-         <MenuItem mnemonicParsing="false" text="Delete" />
-         <SeparatorMenuItem mnemonicParsing="false" />
-         <MenuItem mnemonicParsing="false" text="Select All" />
-         <MenuItem mnemonicParsing="false" text="Unselect All" />
+         <MenuItem mnemonicParsing="false" text="Selecionar Todos"  onAction="#menuBarEditSelectAllOnClick" />
+         <MenuItem mnemonicParsing="false" text="Desselecionar Todos" onAction="#menuBarEditUnselectAllOnClick" />
       </Menu>
       <Menu mnemonicParsing="false" text="Compilação">
-         <items>
-            <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
-         </items>
+         <MenuItem mnemonicParsing="false" text="Compilar" onAction="#menuBarCompileOnClick" />
+         <MenuItem mnemonicParsing="false" text="Executar"  onAction="#menuBarRunOnClick" />
+         <MenuItem mnemonicParsing="false" text="Parar Execução" onAction="#menuBarStopOnClick" />
       </Menu>
    </MenuBar>
-   <AnchorPane fx:id="anchorPane" maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+   <AnchorPane fx:id="anchorPane" maxHeight="-1.0" maxWidth="-1.0" prefHeight="661.0" prefWidth="900.0" VBox.vgrow="ALWAYS">
       <TextArea fx:id="codeTextArea" layoutX="11.0" layoutY="61.0" onKeyPressed="#onCodeAreaKeyPressed" prefHeight="374.0" prefWidth="878.0" />
-      <TextArea fx:id="consoleTextArea" editable="false" layoutX="11.0" layoutY="448.0" prefHeight="165.0" prefWidth="878.0" />
       <Button fx:id="newFile" layoutX="11.0" layoutY="11.0" mnemonicParsing="false" onAction="#onClickNewFile" prefHeight="39.0" prefWidth="38.0" />
       <Button fx:id="openFile" layoutX="55.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
       <Button fx:id="saveFile" layoutX="100.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
@@ -55,5 +47,6 @@
       <Button fx:id="compile" layoutX="335.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
       <Button fx:id="run" layoutX="382.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
       <Button fx:id="stop" layoutX="450.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
+      <TextArea fx:id="consoleTextArea" editable="false" layoutX="11.0" layoutY="470.0" prefHeight="141.0" prefWidth="878.0" />
    </AnchorPane>
 </VBox>

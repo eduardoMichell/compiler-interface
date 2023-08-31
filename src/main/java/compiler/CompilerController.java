@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import resources.Code;
 import java.net.URL;
 import java.util.Objects;
@@ -70,6 +71,14 @@ public class CompilerController  implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.initialSettings();
         this.screen.updateTextAreaWidth(codeTextArea, consoleTextArea);
+        this.screen.updateTextAreaHeight(codeTextArea, consoleTextArea);
+    }
+
+    @FXML
+    void onCodeAreaKeyPressed(KeyEvent event) {
+        this.code.setCode(this.code.getCode()+event.getText());
+        this.isSaved = false;
+        this.screen.updateTitle(this.code.getFileName() + "*");
     }
 
     @FXML
@@ -78,9 +87,7 @@ public class CompilerController  implements Initializable {
         this.archivesSize++;
         this.code.setFileName("compilador" + this.archivesSize + ".txt");
         this.screen.updateTitle(this.code.getFileName());
-
         this.openedFile = this.code.getFileName();
-
         this.codeTextArea.setDisable(false);
         this.cutText.setDisable(false);
         this.copyText.setDisable(false);
@@ -88,13 +95,76 @@ public class CompilerController  implements Initializable {
     }
 
     @FXML
-    void onCodeAreaKeyPressed(KeyEvent event) {
-        this.code.setCode(this.code.getCode()+event.getText());
-        this.isSaved = false;
-        this.screen.updateTitle(this.code.getFileName() + "*");
-
+    void menuBarFileNewOnClick(ActionEvent event) {
+        System.out.println("Clicou em novo arquivo");
+    }
+      @FXML
+    void menuBarFileOpenOnClick(ActionEvent event) {
+        System.out.println("Clicou em abrir");
     }
 
+    @FXML
+    void menuBarFileCloseOnClick(ActionEvent event) {
+        System.out.println("Clicou em fechar");
+    }
+
+    @FXML
+    void menuBarFileSaveOnClick(ActionEvent event) {
+        System.out.println("Clicou em salvar");
+    }
+    @FXML
+    void menuBarSaveAsNewOnClick(ActionEvent event) {
+        System.out.println("Clicou em salvar como");
+    }
+
+    @FXML
+    void menuBarFileExitOnClick(ActionEvent event) {
+        System.out.println("Clicou em sair");
+    }
+
+    @FXML
+    void menuBarEditCopyOnClick(ActionEvent event) {
+        System.out.println("Clicou em copiar");
+    }
+
+    @FXML
+    void menuBarEditPasteOnClick(ActionEvent event) {
+        System.out.println("Clicou em colar");
+    }
+
+    @FXML
+    void menuBarEditCutOnClick(ActionEvent event) {
+        System.out.println("Clicou em recortar");
+    }
+
+    @FXML
+    void menuBarEditDeleteOnClick(ActionEvent event) {
+        System.out.println("Clicou em deletar");
+    }
+
+    @FXML
+    void menuBarEditSelectAllOnClick(ActionEvent event) {
+        System.out.println("Clicou em selecionar todos");
+    }
+
+    @FXML
+    void menuBarEditUnselectAllOnClick(ActionEvent event) {
+        System.out.println("Clicou em desselecionar todos");
+    }
+
+    @FXML
+    void menuBarCompileOnClick(ActionEvent event) {
+        System.out.println("Clicou em compilar");
+    }
+
+    @FXML
+    void menuBarRunOnClick(ActionEvent event) {
+        System.out.println("Clicou em executar");
+    }
+    @FXML
+    void menuBarStopOnClick(ActionEvent event) {
+        System.out.println("Clicou em parar execução");
+    }
 
     private void setImages() {
         String iconsPath = "/icons/";
@@ -108,7 +178,7 @@ public class CompilerController  implements Initializable {
         saveFile.setTooltip(new Tooltip("Salvar Arquivo"));
 
         this.cutText.setGraphic(new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconsPath + "cut-icon.png")))));
-        cutText.setTooltip(new Tooltip("Cortar Texto"));
+        cutText.setTooltip(new Tooltip("Recortar Texto"));
 
         this.copyText.setGraphic(new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconsPath + "copy-icon.png")))));
         copyText.setTooltip(new Tooltip("Copiar Texto"));
