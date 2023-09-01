@@ -10,7 +10,6 @@ public class LexicalAnalysis {
         private String result = "";
         private boolean validLexical = true;
 
-
         public String getResult(){
             return result;
         }
@@ -26,17 +25,16 @@ public class LexicalAnalysis {
             this.setResult(this.getResult() + "## Lexic error, invalid token ("+t.image+") located at [line:"+t.beginLine+"| column:"+t.beginColumn+"] ##\n");
         }
 
-        private void concatMessage(Token t, String category){
-                 this.setResult("Token: " + t.image + " of category: (" + category + ":" + 0 + ") " +
-                         "located at [line:"+t.beginLine+" | column:"+t.beginColumn+"]\n");
+        public static void main(String[] args) throws ParseException, IOException {
+                  try {
+                      LexicalAnalysis parser = new LexicalAnalysis(
+                         new BufferedReader(new FileReader(args[0]))
+                      );
+                      parser.MainRule();
+                  } catch (FileNotFoundException e) {
+                  } catch (ParseException e) {
+                  }
         }
-
-          public static void main(String[] args) throws ParseException, IOException {
-
-                   LexicalAnalysis parser = new LexicalAnalysis(new FileInputStream(args[0]));
-                   parser.MainRule();
-
-            }
 
 }
 PARSER_END(LexicalAnalysis)
@@ -61,36 +59,6 @@ SKIP : {
 |   <~[]>
 }
 
-TOKEN : {
-      <DO: "do">
-    | <IS: "is">
-    | <AS: "as">
-    | <AND: "and">
-    | <ALL: "all">
-    | <THIS: "this">
-    | <BODY: "body">
-    | <TYPE: "type">
-    | <REAL: "real">
-    | <STRING: "string">
-    | <LOGIC: "logic">
-    | <ENUM: "enum">
-    | <READ: "read">
-    | <WRITE: "write">
-    | <REPEAT: "repeat">
-    | <VARIABLE: "variable">
-    | <CONSTANT: "constant">
-    | <RESULT: "result">
-    | <INTEGER: "integer">
-    | <AVALIATE: "avaliate">
-    | <DESCRIPTION: "description">
-    | <DECLARATION: "declaration">
-    | <DESIGNATE: "designate">
-}
-
-TOKEN : {
-      <TRUE: "true">
-    | <UNTRUE: "untrue">
-}
 
 TOKEN : {
     <SPECIAL_SYMBOLS : "=" | ">" | "<" | "_" |  "{" | "}" | "(" | ")"
@@ -98,6 +66,12 @@ TOKEN : {
     | "|" | "&" | "!">
 }
 
+TOKEN : {
+      <RESERVED_WORD : "designate" | "declaration" | "description" | "true"| "untrue"
+      | "avaliate" | "integer" | "result" | "constant" | "variable" | "repeat" | "write" |
+      "read" | "enum" | "logic" | "string" | "real" | "type" | "body" | "this" | "all" |
+      "and" | "as" | "is" | "do">
+}
 
 TOKEN : {
    <IDENTIFIER : (<CAPITAL_LETTER>)+ (<SYMBOL>)?(
@@ -123,9 +97,6 @@ TOKEN : {
     | <REAL_NUMERICAL_CONSTANT : <DIGIT> (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? "." <DIGIT>(<DIGIT>)? (<DIGIT>)?>
 }
 
-TOKEN : {
-      <RESERVED_WORD : <LETTER> <LETTER> (<LETTER>)*>
-}
 
 TOKEN : {
     <DIGIT: ["0"-"9"]>
@@ -141,14 +112,19 @@ TOKEN : {
 
 void MainRule():{}{
      (lexicalAnalyzer())*
+     <EOF>
 }
 
-void lexicalAnalyzer():{
-    Token t;
-}{
-     <RESERVED_WORD> | <SPECIAL_SYMBOLS> |
-     <IDENTIFIER> | <INTEGER_NUMERICAL_CONSTANT> |
-     <REAL_NUMERICAL_CONSTANT> | <LITERAL_CONSTANT>
 
+void lexicalAnalyzer() : {
+    Token t;
+}
+{
+     t = <RESERVED_WORD> { System.out.println("Reserved Word: " + t.image); }
+   | t = <SPECIAL_SYMBOLS> { System.out.println("Special Symbol: " + t.image); }
+   | t = <IDENTIFIER> { System.out.println("Identifier: " + t.image); }
+   | t = <INTEGER_NUMERICAL_CONSTANT> { System.out.println("Integer Constant: " + t.image); }
+   | t = <REAL_NUMERICAL_CONSTANT> { System.out.println("Real Constant: " + t.image); }
+   | t = <LITERAL_CONSTANT> { System.out.println("Literal Constant: " + t.image); }
 }
 

@@ -10,16 +10,31 @@ public class LexicalAnalysis implements LexicalAnalysisConstants {
             return result;
         }
 
-        public void setResult(String result){
-            this.result = result;
-        }
-
         private void concatError(Token t){
-            this.setResult(this.getResult() + "## Lexic error, invalid token ("+t.image+") located at [line:"+t.beginLine+"| column:"+t.beginColumn+"] ##\u005cn");
+            this.result += "ERROR: Encountered Token '" + t.image + "' located at [line:" + t.beginLine + " | column:" + t.beginColumn+"]\n";
         }
 
-        private void concatMessage(Token t, String category, int categoryNumber){
-                 this.setResult("Token: " + t.image + " of category: (" + category + ":" + categoryNumber + ") " + "\u005cn");
+         private void concatMessage(Token t, String category, int categoryNumber){
+             this.result += "Token: " + t.image + " of category: (" + category + ":" + categoryNumber + ") " +
+                     "located at [line:"+t.beginLine+" | column:"+t.beginColumn+"]\n";
+        }
+
+
+    public static void main(String[] args) throws ParseException, IOException {
+                  try {
+
+                         LexicalAnalysis parser = new LexicalAnalysis(
+                             new BufferedReader(new FileReader(args[0]))
+                         );
+
+                         parser.MainRule();
+
+
+                     } catch (FileNotFoundException e) {
+
+                     } catch (ParseException e) {
+
+                     }
         }
 
   final public void MainRule() throws ParseException {
@@ -27,11 +42,11 @@ public class LexicalAnalysis implements LexicalAnalysisConstants {
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case SPECIAL_SYMBOLS:
+      case RESERVED_WORD:
       case IDENTIFIER:
       case LITERAL_CONSTANT:
       case INTEGER_NUMERICAL_CONSTANT:
-      case REAL_NUMERICAL_CONSTANT:
-      case RESERVED_WORD:{
+      case REAL_NUMERICAL_CONSTANT:{
         ;
         break;
         }
@@ -41,48 +56,45 @@ public class LexicalAnalysis implements LexicalAnalysisConstants {
       }
       lexicalAnalyzer();
     }
+    jj_consume_token(0);
   }
 
   final public void lexicalAnalyzer() throws ParseException {Token t;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case RESERVED_WORD:{
-      jj_consume_token(RESERVED_WORD);
-      this.concatMessage(token, "RESERVED_WORD", RESERVED_WORD);
+          t = jj_consume_token(RESERVED_WORD);
+          this.concatMessage(t, "RESERVED_WORD", RESERVED_WORD);
       break;
       }
-      case SPECIAL_SYMBOLS:{
-        jj_consume_token(SPECIAL_SYMBOLS);
-        this.concatMessage(token, "SPECIAL_SYMBOLS", SPECIAL_SYMBOLS);
-        break;
-      }
-      case IDENTIFIER:{
-        jj_consume_token(IDENTIFIER);
-        this.concatMessage(token, "IDENTIFIER", IDENTIFIER);
-        break;
-      }
-      case INTEGER_NUMERICAL_CONSTANT:{
-        jj_consume_token(INTEGER_NUMERICAL_CONSTANT);
-        this.concatMessage(token, "INTEGER_NUMERICAL_CONSTANT", INTEGER_NUMERICAL_CONSTANT);
-        break;
-      }
-      case REAL_NUMERICAL_CONSTANT:{
-        jj_consume_token(REAL_NUMERICAL_CONSTANT);
-        this.concatMessage(token,"REAL_NUMERICAL_CONSTANT", REAL_NUMERICAL_CONSTANT);
-        break;
-      }
-      case LITERAL_CONSTANT:{
-        jj_consume_token(LITERAL_CONSTANT);
-        this.concatMessage(token, "LITERAL_CONSTANT", LITERAL_CONSTANT);
-        break;
-      }
-      case ASCII:{
-        this.concatMessage(token, "ASCII", ASCII);
-        break;
-      }
-      default:
+    case SPECIAL_SYMBOLS:{
+      t = jj_consume_token(SPECIAL_SYMBOLS);
+      this.concatMessage(t, "SPECIAL_SYMBOLS", SPECIAL_SYMBOLS);
+      break;
+    }
+    case IDENTIFIER:{
+      t = jj_consume_token(IDENTIFIER);
+      this.concatMessage(t, "IDENTIFIER", IDENTIFIER);
+      break;
+    }
+    case INTEGER_NUMERICAL_CONSTANT:{
+      t = jj_consume_token(INTEGER_NUMERICAL_CONSTANT);
+      this.concatMessage(t, "INTEGER_NUMERICAL_CONSTANT", INTEGER_NUMERICAL_CONSTANT);
+      break;
+    }
+    case REAL_NUMERICAL_CONSTANT:{
+      t = jj_consume_token(REAL_NUMERICAL_CONSTANT);
+      this.concatMessage(t,"REAL_NUMERICAL_CONSTANT", REAL_NUMERICAL_CONSTANT);
+      break;
+    }
+    case LITERAL_CONSTANT:{
+      t = jj_consume_token(LITERAL_CONSTANT);
+      this.concatMessage(t, "LITERAL_CONSTANT", LITERAL_CONSTANT);
+      break;
+    }
+    default:
+      System.out.println("error");
       jj_la1[1] = jj_gen;
       jj_consume_token(-1);
-      this.concatError(token);
       throw new ParseException();
     }
   }
@@ -98,16 +110,11 @@ public class LexicalAnalysis implements LexicalAnalysisConstants {
   private int jj_gen;
   final private int[] jj_la1 = new int[2];
   static private int[] jj_la1_0;
-  static private int[] jj_la1_1;
   static {
       jj_la1_init_0();
-      jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x0,0x0,};
-   }
-   private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x3f0,0x3f0,};
+      jj_la1_0 = new int[] {0x1f800,0x1f800,};
    }
 
   /** Constructor with InputStream. */
@@ -224,7 +231,7 @@ public class LexicalAnalysis implements LexicalAnalysisConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[51];
+    boolean[] la1tokens = new boolean[26];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -235,13 +242,10 @@ public class LexicalAnalysis implements LexicalAnalysisConstants {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
             la1tokens[j] = true;
           }
-          if ((jj_la1_1[i] & (1<<j)) != 0) {
-            la1tokens[32+j] = true;
-          }
         }
       }
     }
-    for (int i = 0; i < 51; i++) {
+    for (int i = 0; i < 26; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

@@ -9,85 +9,35 @@ public interface LexicalAnalysisConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int DO = 11;
+  int SPECIAL_SYMBOLS = 11;
   /** RegularExpression Id. */
-  int IS = 12;
+  int RESERVED_WORD = 12;
   /** RegularExpression Id. */
-  int AS = 13;
+  int IDENTIFIER = 13;
   /** RegularExpression Id. */
-  int AND = 14;
+  int LITERAL_CONSTANT = 14;
   /** RegularExpression Id. */
-  int ALL = 15;
+  int INTEGER_NUMERICAL_CONSTANT = 15;
   /** RegularExpression Id. */
-  int THIS = 16;
+  int REAL_NUMERICAL_CONSTANT = 16;
   /** RegularExpression Id. */
-  int BODY = 17;
+  int DIGIT = 17;
   /** RegularExpression Id. */
-  int TYPE = 18;
+  int SYMBOL = 18;
   /** RegularExpression Id. */
-  int REAL = 19;
+  int MINUS = 19;
   /** RegularExpression Id. */
-  int STRING = 20;
+  int SINGLE_QUOTE = 20;
   /** RegularExpression Id. */
-  int LOGIC = 21;
+  int DOUBLE_QUOTE = 21;
   /** RegularExpression Id. */
-  int ENUM = 22;
+  int LETTER = 22;
   /** RegularExpression Id. */
-  int READ = 23;
+  int SMALL_LETTER = 23;
   /** RegularExpression Id. */
-  int WRITE = 24;
+  int CAPITAL_LETTER = 24;
   /** RegularExpression Id. */
-  int REPEAT = 25;
-  /** RegularExpression Id. */
-  int VARIABLE = 26;
-  /** RegularExpression Id. */
-  int CONSTANT = 27;
-  /** RegularExpression Id. */
-  int RESULT = 28;
-  /** RegularExpression Id. */
-  int INTEGER = 29;
-  /** RegularExpression Id. */
-  int AVALIATE = 30;
-  /** RegularExpression Id. */
-  int DESCRIPTION = 31;
-  /** RegularExpression Id. */
-  int DECLARATION = 32;
-  /** RegularExpression Id. */
-  int DESIGNATE = 33;
-  /** RegularExpression Id. */
-  int TRUE = 34;
-  /** RegularExpression Id. */
-  int UNTRUE = 35;
-  /** RegularExpression Id. */
-  int SPECIAL_SYMBOLS = 36;
-  /** RegularExpression Id. */
-  int IDENTIFIER = 37;
-  /** RegularExpression Id. */
-  int LITERAL_CONSTANT = 38;
-  /** RegularExpression Id. */
-  int INTEGER_NUMERICAL_CONSTANT = 39;
-  /** RegularExpression Id. */
-  int REAL_NUMERICAL_CONSTANT = 40;
-  /** RegularExpression Id. */
-  int RESERVED_WORD = 41;
-  /** RegularExpression Id. */
-  int DIGIT = 42;
-  /** RegularExpression Id. */
-  int SYMBOL = 43;
-  /** RegularExpression Id. */
-  int MINUS = 44;
-  /** RegularExpression Id. */
-  int SINGLE_QUOTE = 45;
-  /** RegularExpression Id. */
-  int DOUBLE_QUOTE = 46;
-  /** RegularExpression Id. */
-  int LETTER = 47;
-  /** RegularExpression Id. */
-  int SMALL_LETTER = 48;
-  /** RegularExpression Id. */
-  int CAPITAL_LETTER = 49;
-  /** RegularExpression Id. */
-  int ASCII = 50;
+  int ASCII = 25;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -109,37 +59,12 @@ public interface LexicalAnalysisConstants {
     "<token of kind 8>",
     "<token of kind 9>",
     "<token of kind 10>",
-    "\"do\"",
-    "\"is\"",
-    "\"as\"",
-    "\"and\"",
-    "\"all\"",
-    "\"this\"",
-    "\"body\"",
-    "\"type\"",
-    "\"real\"",
-    "\"string\"",
-    "\"logic\"",
-    "\"enum\"",
-    "\"read\"",
-    "\"write\"",
-    "\"repeat\"",
-    "\"variable\"",
-    "\"constant\"",
-    "\"result\"",
-    "\"integer\"",
-    "\"avaliate\"",
-    "\"description\"",
-    "\"declaration\"",
-    "\"designate\"",
-    "\"true\"",
-    "\"untrue\"",
     "<SPECIAL_SYMBOLS>",
+    "<RESERVED_WORD>",
     "<IDENTIFIER>",
     "<LITERAL_CONSTANT>",
     "<INTEGER_NUMERICAL_CONSTANT>",
     "<REAL_NUMERICAL_CONSTANT>",
-    "<RESERVED_WORD>",
     "<DIGIT>",
     "<SYMBOL>",
     "<MINUS>",

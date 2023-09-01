@@ -1,5 +1,6 @@
 package compiler;
 import LexicalAnalysis.ParseException;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,11 +18,7 @@ import java.util.*;
 
 public class CompilerController  implements Initializable {
 
-    private int archivesSize = 0;
-
-    private String openedFile = "";
-
-    private boolean isSaved = true;
+    private int archivesSize = 1;
 
     CompilerApplication screen;
 
@@ -75,13 +72,6 @@ public class CompilerController  implements Initializable {
     }
 
     @FXML
-    void buttonNewFileOnPressed(KeyEvent event) {
-        this.codeController.setCode(this.codeController.getCode()+event.getText());
-        this.isSaved = false;
-        this.screen.updateTitle(this.codeController.getFileName() + "*");
-    }
-
-    @FXML
     void onCodeAreaKeyPressed(KeyEvent event) {
         this.codeController.setCode(this.codeTextArea.getText()+event.getText());
         this.codeController.setFileEdited(true);
@@ -90,21 +80,43 @@ public class CompilerController  implements Initializable {
 
     @FXML
     void onClickNewFile(ActionEvent event) {
-        this.codeController = new CodeController(codeTextArea.getText());
+        System.out.println(this.codeController.isFileEdited());
+        if(!this.codeController.isFileEdited()) {
+            this.newFile();
+            this.disableIDE(false);
+        } else {
+            this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
+            if(!this.codeController.isFileEdited()){
+                System.out.println(this.codeController.isFileEdited());
+                this.newFile();
+                this.disableIDE(false);
+            }
+        }
+    }
+
+    void newFile(){
+        this.codeTextArea.setText("");
+        this.codeController.newFile(this.archivesSize);
         this.archivesSize++;
-        this.codeController.setFileName("compilador" + this.archivesSize + ".txt");
-        this.screen.updateTitle(this.codeController.getFileName());
-        this.openedFile = this.codeController.getFileName();
+        this.screen.updateTitle(this.codeController.getFileName() + "*");
         this.disableIDE(false);
     }
 
-
-
     @FXML
     void onClickOpenFile(ActionEvent event) throws IOException {
-        this.eraseAll();
+        if(!this.codeController.isFileEdited()) {
+         this.openFile();
+        } else {
+            this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
+            this.openFile();
+        }
+    }
+
+    void openFile() throws IOException {
         this.codeController.openFile(codeTextArea, screen);
-        this.disableIDE(false);
+        if(this.codeController.getFile() != null){
+            this.disableIDE(false);
+        }
     }
 
     void disableIDE(boolean variable){
@@ -119,59 +131,45 @@ public class CompilerController  implements Initializable {
         this.codeController.setFile(null);
         this.codeController.setFileName("");
         this.codeController.setCode("");
-
+        this.codeController.setFileEdited(false);
         this.codeTextArea.setText("");
         this.consoleTextArea.setText("");
-
         this.disableIDE(true);
-
         this.screen.updateTitle("");
+    }
+
+    void cancelSaveFile(){
+      this.eraseAll();
     }
 
     @FXML
     void onClickSaveFile(ActionEvent event) {
-
+        if(this.codeController.isFileEdited()) {
+            this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
+        }
     }
 
     @FXML
     void onClickCutText(ActionEvent event) {
-
+        this.codeController.cutSelectedText(codeTextArea);
     }
 
     @FXML
     void onClickCopyText(ActionEvent event) {
-
+        this.codeController.copySelectedText(codeTextArea);
     }
 
     @FXML
     void onClickPastText(ActionEvent event) {
-
+        this.codeController.pasteSelectedText(codeTextArea);
     }
 
     @FXML
     void onClickCompile(ActionEvent event) throws ParseException {
         this.consoleTextArea.setText("");
-//        String[] tokens = this.codeController.getCode().split(" ");
-//        for (String token : tokens) {
-            InputStream concatenatedStream = getCodeInputStream();
-            this.codeController.compile(concatenatedStream, consoleTextArea);
-//        }
-
+        this.codeController.compile(this.codeTextArea.getText(), consoleTextArea);
     }
 
-    InputStream getCodeInputStream( ){
-
-        String[] stringArray = this.codeController.getCode().split(" ");
-
-        List<InputStream> inputStreams = new ArrayList<>();
-
-        for (String str : stringArray) {
-            inputStreams.add(new ByteArrayInputStream(str.getBytes()));
-        }
-//        List<InputStream> inputStreams = new ArrayList<>();
-//        inputStreams.add(new ByteArrayInputStream(token.getBytes()));
-        return new SequenceInputStream(Collections.enumeration(inputStreams));
-    }
 
     @FXML
     void onClickRun(ActionEvent event) {
@@ -184,66 +182,105 @@ public class CompilerController  implements Initializable {
 
     @FXML
     void menuBarFileNewOnClick(ActionEvent event) {
-
+        if(!this.codeController.isFileEdited()) {
+            this.newFile();
+            this.disableIDE(false);
+        } else {
+            this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
+            if(!this.codeController.isFileEdited()){
+                System.out.println(this.codeController.isFileEdited());
+                this.newFile();
+                this.disableIDE(false);
+            }
+        }
     }
       @FXML
     void menuBarFileOpenOnClick(ActionEvent event) throws IOException {
-        this.eraseAll();
-        this.codeController.openFile(codeTextArea, screen);
-        this.disableIDE(false);
+          if(!this.codeController.isFileEdited()) {
+              this.openFile();
+          } else {
+              this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
+              this.openFile();
+          }
     }
     @FXML
     void menuBarFileCloseOnClick(ActionEvent event) {
-        this.eraseAll();
+        if(!this.codeController.isFileEdited()) {
+            this.eraseAll();
+        } else {
+            this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
+            this.eraseAll();
+        }
     }
 
     @FXML
-    void menuBarFileSaveOnClick(ActionEvent event) {
-        System.out.println("Clicou em salvar");
+    void menuBarFileSaveOnClick(ActionEvent event) throws IOException {
+        if(this.codeController.isFileEdited()) {
+            if(this.codeController.getFile() != null){
+                this.codeController.saveFile(this.codeTextArea.getText(), this.codeController.getFile());
+            } else {
+                File newFile = screen.chooseFilePath("Save As");
+                if(newFile != null) {
+                    this.codeController.saveFile(this.codeTextArea.getText(), newFile);
+                    this.screen.updateTitle(newFile.getName());
+                }
+            }
+        }
     }
     @FXML
-    void menuBarSaveAsNewOnClick(ActionEvent event) {
-        System.out.println("Clicou em salvar como");
+    void menuBarSaveAsNewOnClick(ActionEvent event) throws IOException {
+        if(this.codeController.isFileEdited()) {
+                File newFile = screen.chooseFilePath("Save As");
+                if(newFile != null) {
+                    this.codeController.saveFile(this.codeTextArea.getText(), newFile);
+                    this.screen.updateTitle(newFile.getName());
+                }
+        }
     }
 
     @FXML
     void menuBarFileExitOnClick(ActionEvent event) {
-        System.out.println("Clicou em sair");
+        if(!this.codeController.isFileEdited()) {
+           Platform.exit();
+        } else {
+            this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
+        }
     }
 
     @FXML
     void menuBarEditCopyOnClick(ActionEvent event) {
-        System.out.println("Clicou em copiar");
+        this.codeController.copySelectedText(codeTextArea);
     }
 
     @FXML
     void menuBarEditPasteOnClick(ActionEvent event) {
-        System.out.println("Clicou em colar");
+        this.codeController.pasteSelectedText(codeTextArea);
     }
 
     @FXML
     void menuBarEditCutOnClick(ActionEvent event) {
-        System.out.println("Clicou em recortar");
+        this.codeController.cutSelectedText(codeTextArea);
     }
 
     @FXML
     void menuBarEditDeleteOnClick(ActionEvent event) {
-        System.out.println("Clicou em deletar");
+        this.codeController.deleteSelectedText(codeTextArea);
     }
 
     @FXML
     void menuBarEditSelectAllOnClick(ActionEvent event) {
-        System.out.println("Clicou em selecionar todos");
+        this.codeController.selectAllText(codeTextArea);
     }
 
     @FXML
     void menuBarEditUnselectAllOnClick(ActionEvent event) {
-        System.out.println("Clicou em desselecionar todos");
+        this.codeController.deselectAllText(codeTextArea);
     }
 
     @FXML
     void menuBarCompileOnClick(ActionEvent event) {
-        System.out.println("Clicou em compilar");
+        this.consoleTextArea.setText("");
+        this.codeController.compile(this.codeTextArea.getText(), consoleTextArea);
     }
 
     @FXML
