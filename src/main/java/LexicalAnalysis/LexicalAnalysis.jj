@@ -1,0 +1,154 @@
+options {
+    STATIC = false;
+}
+
+PARSER_BEGIN(LexicalAnalysis)
+import java.io.*;
+
+public class LexicalAnalysis {
+
+        private String result = "";
+        private boolean validLexical = true;
+
+
+        public String getResult(){
+            return result;
+        }
+
+        public void setResult(String result){
+            this.result = result;
+        }
+        public boolean isValidLexical(){
+            return validLexical;
+        }
+
+        private void concatError(Token t){
+            this.setResult(this.getResult() + "## Lexic error, invalid token ("+t.image+") located at [line:"+t.beginLine+"| column:"+t.beginColumn+"] ##\n");
+        }
+
+        private void concatMessage(Token t, String category){
+                 this.setResult("Token: " + t.image + " of category: (" + category + ":" + 0 + ") " +
+                         "located at [line:"+t.beginLine+" | column:"+t.beginColumn+"]\n");
+        }
+
+          public static void main(String[] args) throws ParseException, IOException {
+
+                   LexicalAnalysis parser = new LexicalAnalysis(new FileInputStream(args[0]));
+                   parser.MainRule();
+
+            }
+
+}
+PARSER_END(LexicalAnalysis)
+
+SKIP: { " " | "\t" | "\n" | "\r" }
+
+SKIP : {
+  "/*" : multilinecomment
+}
+
+SKIP : {
+  "//" : singlelinecomment
+}
+
+<multilinecomment> SKIP: {
+   "*/" : DEFAULT
+|  <~[]>
+}
+
+<singlelinecomment> SKIP: {
+   <["\n","\r"]> : DEFAULT
+|   <~[]>
+}
+
+TOKEN : {
+      <DO: "do">
+    | <IS: "is">
+    | <AS: "as">
+    | <AND: "and">
+    | <ALL: "all">
+    | <THIS: "this">
+    | <BODY: "body">
+    | <TYPE: "type">
+    | <REAL: "real">
+    | <STRING: "string">
+    | <LOGIC: "logic">
+    | <ENUM: "enum">
+    | <READ: "read">
+    | <WRITE: "write">
+    | <REPEAT: "repeat">
+    | <VARIABLE: "variable">
+    | <CONSTANT: "constant">
+    | <RESULT: "result">
+    | <INTEGER: "integer">
+    | <AVALIATE: "avaliate">
+    | <DESCRIPTION: "description">
+    | <DECLARATION: "declaration">
+    | <DESIGNATE: "designate">
+}
+
+TOKEN : {
+      <TRUE: "true">
+    | <UNTRUE: "untrue">
+}
+
+TOKEN : {
+    <SPECIAL_SYMBOLS : "=" | ">" | "<" | "_" |  "{" | "}" | "(" | ")"
+    | "[" |  "]"| "," | "." | "+" | "-" | "*" | "/" | "%"
+    | "|" | "&" | "!">
+}
+
+
+TOKEN : {
+   <IDENTIFIER : (<CAPITAL_LETTER>)+ (<SYMBOL>)?(
+       (<LETTER>)* |
+       <LETTER> <SYMBOL> |
+       <DIGIT> <DIGIT> <LETTER> |
+       <DIGIT> <DIGIT> <SYMBOL> |
+       <DIGIT> <LETTER> |
+       <DIGIT> <SYMBOL> |
+       <DIGIT> <SYMBOL> <LETTER> |
+       <DIGIT> <DIGIT> <SYMBOL> <LETTER> |
+       <DIGIT> (<LETTER>)+ <SYMBOL> |
+       <DIGIT> <DIGIT> (<LETTER>)+ <SYMBOL>
+   )*>
+}
+
+TOKEN : {
+      <LITERAL_CONSTANT  : <SINGLE_QUOTE> (<ASCII>)* <SINGLE_QUOTE> |<DOUBLE_QUOTE> (<ASCII>)* <DOUBLE_QUOTE>>
+}
+
+TOKEN : {
+      <INTEGER_NUMERICAL_CONSTANT : <DIGIT> (<DIGIT>)? (<DIGIT>)?>
+    | <REAL_NUMERICAL_CONSTANT : <DIGIT> (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? "." <DIGIT>(<DIGIT>)? (<DIGIT>)?>
+}
+
+TOKEN : {
+      <RESERVED_WORD : <LETTER> <LETTER> (<LETTER>)*>
+}
+
+TOKEN : {
+    <DIGIT: ["0"-"9"]>
+  | <SYMBOL: ["_"]>
+  | <MINUS: ("-"){1}>
+  | <SINGLE_QUOTE: "'">
+  | <DOUBLE_QUOTE: "\"">
+  | <LETTER: ["A"-"Z","a"-"z"]>
+  | <SMALL_LETTER : ["a"-"z"]>
+  | <CAPITAL_LETTER : ["A"-"Z"]>
+  | <ASCII: (~[])>
+}
+
+void MainRule():{}{
+     (lexicalAnalyzer())*
+}
+
+void lexicalAnalyzer():{
+    Token t;
+}{
+     <RESERVED_WORD> | <SPECIAL_SYMBOLS> |
+     <IDENTIFIER> | <INTEGER_NUMERICAL_CONSTANT> |
+     <REAL_NUMERICAL_CONSTANT> | <LITERAL_CONSTANT>
+
+}
+

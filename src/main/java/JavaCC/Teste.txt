@@ -1,3 +1,0 @@
-declaration type [
-        M2 is {  }.
-]

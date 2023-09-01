@@ -1,6 +1,10 @@
 package resources;
 
+import LexicalAnalysis.LexicalAnalysis;
+
 public class Code {
+
+    private LexicalAnalysis LexicalAnalysis;
     private String code;
     private String fileName;
 
