@@ -39,14 +39,14 @@
    <AnchorPane fx:id="anchorPane" maxHeight="-1.0" maxWidth="-1.0" prefHeight="661.0" prefWidth="900.0" VBox.vgrow="ALWAYS">
       <TextArea fx:id="codeTextArea" layoutX="11.0" layoutY="61.0" onKeyPressed="#onCodeAreaKeyPressed" prefHeight="374.0" prefWidth="878.0" />
       <Button fx:id="newFile" layoutX="11.0" layoutY="11.0" mnemonicParsing="false" onAction="#onClickNewFile" prefHeight="39.0" prefWidth="38.0" />
-      <Button fx:id="openFile" layoutX="55.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
-      <Button fx:id="saveFile" layoutX="100.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
-      <Button fx:id="cutText" layoutX="172.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
-      <Button fx:id="copyText" layoutX="219.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
-      <Button fx:id="pasteText" layoutX="266.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
-      <Button fx:id="compile" layoutX="335.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
-      <Button fx:id="run" layoutX="382.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
-      <Button fx:id="stop" layoutX="450.0" layoutY="11.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="38.0" />
+      <Button fx:id="openFile" layoutX="55.0" layoutY="11.0" mnemonicParsing="false" onAction="#onClickOpenFile" prefHeight="39.0" prefWidth="38.0" />
+      <Button fx:id="saveFile" layoutX="100.0" layoutY="11.0" mnemonicParsing="false" onAction="#onClickSaveFile" prefHeight="39.0" prefWidth="38.0" />
+      <Button fx:id="cutText" layoutX="172.0" layoutY="11.0" mnemonicParsing="false" onAction="#onClickCutText" prefHeight="39.0" prefWidth="38.0" />
+      <Button fx:id="copyText" layoutX="219.0" layoutY="11.0" mnemonicParsing="false" onAction="#onClickCopyText" prefHeight="39.0" prefWidth="38.0" />
+      <Button fx:id="pasteText" layoutX="266.0" layoutY="11.0" mnemonicParsing="false" onAction="#onClickPastText" prefHeight="39.0" prefWidth="38.0" />
+      <Button fx:id="compile" layoutX="335.0" layoutY="11.0" mnemonicParsing="false" onAction="#onClickCompile" prefHeight="39.0" prefWidth="38.0" />
+      <Button fx:id="run" layoutX="382.0" layoutY="11.0" mnemonicParsing="false" onAction="#onClickRun" prefHeight="39.0" prefWidth="38.0" />
+      <Button fx:id="stop" layoutX="450.0" layoutY="11.0" mnemonicParsing="false" onAction="#onClickStop" prefHeight="39.0" prefWidth="38.0" />
       <TextArea fx:id="consoleTextArea" editable="false" layoutX="11.0" layoutY="470.0" prefHeight="141.0" prefWidth="878.0" />
    </AnchorPane>
 </VBox>

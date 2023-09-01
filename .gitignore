@@ -36,7 +36,3 @@ build/
 
 ### Mac OS ###
 .DS_Store
-
-
-/src/main/java/javaCC/*.java
-/src/main/java/javaCC/*.class

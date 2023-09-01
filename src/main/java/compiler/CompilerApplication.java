@@ -2,16 +2,18 @@ package compiler;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
 public class CompilerApplication extends Application {
+
+    FileChooser fileChooser = new FileChooser();
     private static CompilerApplication instance;
     public static CompilerApplication getInstance() {
         return instance;
@@ -28,7 +30,6 @@ public class CompilerApplication extends Application {
         stage.setMaximized(true);
         stage.setMinWidth(550);
         stage.setMinHeight(690);
-
         stage.setTitle("Compilador");
         stage.setScene(scene);
         stage.show();
@@ -55,6 +56,11 @@ public class CompilerApplication extends Application {
             codeTextArea.setPrefHeight(stage.getHeight() - 320);
             consoleTextArea.setLayoutY(stage.getHeight() - 240);
         });
+    }
+
+    public File openFile(String title){
+        fileChooser.setTitle(title);
+        return fileChooser.showOpenDialog(stage);
     }
 
     public static void main(String[] args) {
