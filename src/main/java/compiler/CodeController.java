@@ -63,10 +63,10 @@ public class CodeController {
             String line;
             while ((line = reader.readLine()) != null) {
                 this.addTextToCodeTextArea(codeTextArea, line);
-                screen.updateTitle(file.getName());
             }
             this.setFile(file);
             this.setFileName(file.getName());
+            screen.updateTitle(file.getName());
             this.setCode(codeTextArea.getText());
             this.setFileEdited(false);
             reader.close();
@@ -150,11 +150,8 @@ public class CodeController {
            parser = new LexicalAnalysis(new BufferedReader(new StringReader(code)));
            parser.MainRule();
            consoleTextArea.setText(consoleTextArea.getText() + parser.getResult());
-           System.out.println(parser.token.kind);
        } catch (ParseException e){
-           System.out.println(parser.getResult());
-           System.out.println(e);
-           consoleTextArea.setText(consoleTextArea.getText() + parser.getResult());
+           consoleTextArea.setText(consoleTextArea.getText() + parser.getResult() + e.getMessage());
        }
 
     }

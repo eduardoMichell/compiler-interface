@@ -10,13 +10,10 @@ public class LexicalAnalysis implements LexicalAnalysisConstants {
             return result;
         }
 
-        private void concatError(Token t){
-            this.result += "ERROR: Encountered Token '" + t.image + "' located at [line:" + t.beginLine + " | column:" + t.beginColumn+"]\n";
-        }
-
          private void concatMessage(Token t, String category, int categoryNumber){
-             this.result += "Token: " + t.image + " of category: (" + category + ":" + categoryNumber + ") " +
-                     "located at [line:"+t.beginLine+" | column:"+t.beginColumn+"]\n";
+           System.out.println("concatenando");
+           this.result += "Token: " + t.image + " of category: (" + category + ":" + categoryNumber + ") " +
+                    "located at [line:"+t.beginLine+" | column:"+t.beginColumn+"]\n";
         }
 
 
@@ -92,7 +89,6 @@ public class LexicalAnalysis implements LexicalAnalysisConstants {
       break;
     }
     default:
-      System.out.println("error");
       jj_la1[1] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();

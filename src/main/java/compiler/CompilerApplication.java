@@ -70,11 +70,12 @@ public class CompilerApplication extends Application {
     }
 
 
-    public File chooseFilePath(String title){
+    public File chooseFilePath(String title, String fileName){
         fileChooser.setTitle(title);
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Text Files", "*.txt")
         );
+        fileChooser.setInitialFileName(!fileName.isEmpty() ? fileName : "");
         return fileChooser.showSaveDialog(stage);
     }
 
@@ -97,7 +98,7 @@ public class CompilerApplication extends Application {
                     controller.saveFile(code, controller.getFile());
                     this.updateTitle(controller.getFileName());
                 } else {
-                    File newFile = chooseFilePath("Save New File");
+                    File newFile = chooseFilePath("Save New File", controller.getFileName());
                     if(newFile != null){
                         controller.saveFile(code, newFile);
                         this.updateTitle(newFile.getName());
