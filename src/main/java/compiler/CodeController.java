@@ -62,7 +62,7 @@ public class CodeController {
             BufferedReader reader = new BufferedReader(new FileReader(file.getAbsoluteFile()));
             String line;
             while ((line = reader.readLine()) != null) {
-                this.addTextToCodeTextArea(codeTextArea, line);
+                this.addTextToCodeTextArea(codeTextArea, line + "\n");
             }
             this.setFile(file);
             this.setFileName(file.getName());
@@ -71,7 +71,6 @@ public class CodeController {
             this.setFileEdited(false);
             reader.close();
         }
-
     }
 
     public void saveFile(String code, File file) throws IOException {
@@ -135,6 +134,7 @@ public class CodeController {
     void deselectAllText(TextArea codeTextArea){
         codeTextArea.deselect();
     }
+
     void addTextToCodeTextArea(TextArea codeTextArea, String text){
         codeTextArea.setText(codeTextArea.getText() + text);
     }
@@ -142,7 +142,6 @@ public class CodeController {
     void eraseCodeTextArea(TextArea codeTextArea){
         codeTextArea.setText("");
     }
-
 
     void compile(String code, TextArea consoleTextArea) {
         LexicalAnalysis parser = null;

@@ -21,20 +21,32 @@ public class LexicalAnalysis {
             return validLexical;
         }
 
-        private void concatError(Token t){
-            this.setResult(this.getResult() + "## Lexic error, invalid token ("+t.image+") located at [line:"+t.beginLine+"| column:"+t.beginColumn+"] ##\n");
+
+        private void concatMessage(Token t, String category, int categoryNumber) {
+            this.result += "Token: " + t.image + " of category: (" + category + ":" + categoryNumber + ") " +
+                    "located at [line:" + t.beginLine + " | column:" + t.beginColumn + "]\n";
         }
 
         public static void main(String[] args) throws ParseException, IOException {
+
                   try {
                       LexicalAnalysis parser = new LexicalAnalysis(
                          new BufferedReader(new FileReader(args[0]))
                       );
                       parser.MainRule();
+
+                      if(parser.token_source.foundLexError() != 0){
+                         System.err.println(parser.token_source.foundLexError() + " Lexical Error found.");
+                      } else {
+                         System.err.println("Program successfully analyzed.");
+                      }
                   } catch (FileNotFoundException e) {
-                  } catch (ParseException e) {
-                  }
+                    System.err.println("Erro FileNotFoundException: " + e.getMessage());
+                 } catch (ParseException e) {
+                    System.err.println("Erro ParseException: " + e.getMessage());
+                 }
         }
+
 
 }
 PARSER_END(LexicalAnalysis)
@@ -59,18 +71,133 @@ SKIP : {
 |   <~[]>
 }
 
+TOKEN_MGR_DECLS : {
+    int countLexError = 0;
 
-TOKEN : {
-    <SPECIAL_SYMBOLS : "=" | ">" | "<" | "_" |  "{" | "}" | "(" | ")"
-    | "[" |  "]"| "," | "." | "+" | "-" | "*" | "/" | "%"
-    | "|" | "&" | "!">
+    public int foundLexError(){
+        return countLexError;
+    }
+}
+
+SPECIAL_TOKEN :
+{
+    <INVALID_LEXICAL:
+    (~ ["a"-"z", "A"-"Z",
+        "0"-"9",
+        "\"",
+//        "!=",
+//       "=",
+//       "==",
+//       ">>",
+//       "<<",
+//       "<<=",
+//       ">>=",
+       "|",
+       "&",
+       "!",
+       "+",
+       "-",
+       "*",
+       "/",
+       "%",
+//       "%%",
+//       "**",
+       ".",
+       ",",
+       "{",
+       "}",
+       "[",
+       "]",
+       "(",
+       ")",
+        " ",
+        "\t",
+        "\n",
+        "\r",
+        "\f"
+    ])+>
+        {
+            System.err.println("Line " + input_stream.getEndLine() + " - Invalid string found: " + image);
+            countLexError++;
+        } |
+         <INVALID_CONST:
+           "\"" (~ ["\n", "\r", "\""])* ["\n", "\r"]>
+                {
+                    System.err.println("Line " + input_stream.getEndLine() + " - String constant has a: " + image);
+                    countLexError++;
+                }
+
 }
 
 TOKEN : {
-      <RESERVED_WORD : "designate" | "declaration" | "description" | "true"| "untrue"
-      | "avaliate" | "integer" | "result" | "constant" | "variable" | "repeat" | "write" |
-      "read" | "enum" | "logic" | "string" | "real" | "type" | "body" | "this" | "all" |
-      "and" | "as" | "is" | "do">
+      <DO: "do">
+    | <IS: "is">
+    | <AS: "as">
+    | <AND: "and">
+    | <ALL: "all">
+    | <THIS: "this">
+    | <BODY: "body">
+    | <TYPE: "type">
+    | <REAL: "real">
+    | <STRING: "string">
+    | <LOGIC: "logic">
+    | <ENUM: "enum">
+    | <READ: "read">
+    | <WRITE: "write">
+    | <REPEAT: "repeat">
+    | <VARIABLE: "variable">
+    | <CONSTANT: "constant">
+    | <RESULT: "result">
+    | <INTEGER: "integer">
+    | <AVALIATE: "avaliate">
+    | <DESCRIPTION: "description">
+    | <DECLARATION: "declaration">
+    | <DESIGNATE: "designate">
+}
+
+TOKEN : {
+      <TRUE: "true">
+    | <UNTRUE: "untrue">
+}
+
+TOKEN : {
+      <NOT_EQUAL: "!=">
+    | <ATTRIBUTION: "=">
+    | <EQUAL: "==">
+    | <GREATERTHEN: ">>">
+    | <LESSTHEN: "<<">
+    | <LESS_EQUALS: "<<=">
+    | <GREATER_EQUALS: ">>=">
+}
+
+TOKEN : {
+       <OR_LOGIC: "|">
+     | <AND_LOGIC: "&">
+     | <NEGATE_LOGIC : "!">
+}
+
+TOKEN : {
+      <PLUS: "+">
+    | <SUBTRACTION: "-">
+    | <MULTIPLY: "*">
+    | <DIVISION: "/">
+    | <INTEGER_DIVISION: "%">
+    | <DIVISION_REMAINDER: "%%">
+    | <POTENCE: "**">
+}
+
+TOKEN : {
+      <SEMI_COLUMN: ",">
+    | <DOT: ".">
+}
+
+TOKEN : {
+      <OPEN_KEYS: "{">
+    | <CLOSE_KEYS: "}">
+    | <OPEN_BOX: "[">
+    | <CLOSE_BOX: "]">
+    | <OPEN_BRACKETS: "(">
+    | <CLOSE_BRACKETS: ")">
 }
 
 TOKEN : {
@@ -116,15 +243,71 @@ void MainRule():{}{
 }
 
 
+
+
 void lexicalAnalyzer() : {
     Token t;
 }
 {
-     t = <RESERVED_WORD> { System.out.println("Reserved Word: " + t.image); }
-   | t = <SPECIAL_SYMBOLS> { System.out.println("Special Symbol: " + t.image); }
-   | t = <IDENTIFIER> { System.out.println("Identifier: " + t.image); }
-   | t = <INTEGER_NUMERICAL_CONSTANT> { System.out.println("Integer Constant: " + t.image); }
-   | t = <REAL_NUMERICAL_CONSTANT> { System.out.println("Real Constant: " + t.image); }
-   | t = <LITERAL_CONSTANT> { System.out.println("Literal Constant: " + t.image); }
+try {
+    <DO>
+  | <IS>
+  | <AS>
+  | <AND>
+  | <ALL>
+  | <THIS>
+  | <BODY>
+  | <TYPE>
+  | <REAL>
+  | <STRING>
+  | <LOGIC>
+  | <ENUM>
+  | <READ>
+  | <WRITE>
+  | <REPEAT>
+  | <VARIABLE>
+  | <CONSTANT>
+  | <RESULT>
+  | <INTEGER>
+  | <AVALIATE>
+  | <DESCRIPTION>
+  | <DECLARATION>
+  | <DESIGNATE>
+  | <TRUE>
+  | <UNTRUE>
+  |  <NOT_EQUAL>
+  | <ATTRIBUTION>
+  | <EQUAL>
+  | <GREATERTHEN>
+  | <LESSTHEN>
+  | <LESS_EQUALS>
+  | <GREATER_EQUALS>
+  | <OR_LOGIC>
+  | <AND_LOGIC>
+  | <NEGATE_LOGIC>
+  | <PLUS>
+  | <SUBTRACTION>
+  | <MULTIPLY>
+  | <DIVISION>
+  | <INTEGER_DIVISION>
+  | <DIVISION_REMAINDER>
+  | <POTENCE>
+  | <SEMI_COLUMN>
+  | <DOT>
+  | <OPEN_KEYS>
+  | <CLOSE_KEYS>
+  | <OPEN_BOX>
+  | <CLOSE_BOX>
+  | <OPEN_BRACKETS>
+  | <CLOSE_BRACKETS>
+  | t = <IDENTIFIER> { System.out.println("Identifier: " + t.image); }
+  | t = <INTEGER_NUMERICAL_CONSTANT> { System.out.println("Integer Constant: " + t.image); }
+  | t = <REAL_NUMERICAL_CONSTANT> { System.out.println("Real Constant: " + t.image); }
+  | t = <LITERAL_CONSTANT> { System.out.println("Literal Constant: " + t.image); }
+  | t = <ASCII> { System.out.println("Erro: " + t.image); validLexical = false;}
+  } catch (ParseException e){
+    error_skipto(t.kind);
+  }
+
 }
 

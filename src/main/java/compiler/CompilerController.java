@@ -5,12 +5,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
 
 import java.io.*;
 import java.net.URL;
@@ -24,6 +26,15 @@ public class CompilerController  implements Initializable {
 
     @FXML
     private AnchorPane anchorPane;
+
+    @FXML
+    private AnchorPane anchorPaneCodeTextArea;
+
+    @FXML
+    private AnchorPane anchorPaneConsoleTextArea;
+
+    @FXML
+    private SplitPane splitPane;
 
     @FXML
     private TextArea consoleTextArea;
@@ -58,6 +69,8 @@ public class CompilerController  implements Initializable {
     @FXML
     private Button stop = new Button();
 
+    @FXML
+    private Text lineColumnText;
     private CodeController codeController;
 
     public CompilerController() {
@@ -67,8 +80,13 @@ public class CompilerController  implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.initialSettings();
-        this.screen.updateTextAreaWidth(codeTextArea, consoleTextArea);
-        this.screen.updateTextAreaHeight(codeTextArea, consoleTextArea);
+        this.screen.autoResizeSplitPaneWidth(splitPane, lineColumnText);
+        this.screen.autoResizeSplitPaneHeight(splitPane, lineColumnText);
+        this.screen.setLineAndColumn(codeTextArea, lineColumnText);
+
+
+        this.screen.defineSplitPane(codeTextArea, consoleTextArea, splitPane);
+
     }
 
     @FXML
@@ -288,31 +306,31 @@ public class CompilerController  implements Initializable {
     private void setImages() {
         String iconsPath = "/icons/";
         this.newFile.setGraphic(new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconsPath + "new-file-icon.png")))));
-        newFile.setTooltip(new Tooltip("Novo Arquivo"));
+        newFile.setTooltip(new Tooltip("New Archive"));
 
         this.openFile.setGraphic(new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconsPath + "open-file-icon.png")))));
-        openFile.setTooltip(new Tooltip("Abrir Arquivo"));
+        openFile.setTooltip(new Tooltip("Open Archive"));
 
         this.saveFile.setGraphic(new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconsPath + "save-file-icon.png")))));
-        saveFile.setTooltip(new Tooltip("Salvar Arquivo"));
+        saveFile.setTooltip(new Tooltip("Save Archive"));
 
         this.cutText.setGraphic(new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconsPath + "cut-icon.png")))));
-        cutText.setTooltip(new Tooltip("Recortar Texto"));
+        cutText.setTooltip(new Tooltip("Cut Text"));
 
         this.copyText.setGraphic(new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconsPath + "copy-icon.png")))));
-        copyText.setTooltip(new Tooltip("Copiar Texto"));
+        copyText.setTooltip(new Tooltip("Copy Text"));
 
         this.pasteText.setGraphic(new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconsPath + "paste-icon.png")))));
-        pasteText.setTooltip(new Tooltip("Colar Texto"));
+        pasteText.setTooltip(new Tooltip("Paste Text"));
 
         this.compile.setGraphic(new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconsPath + "compile-icon.png")))));
-        compile.setTooltip(new Tooltip("Compilar Código"));
+        compile.setTooltip(new Tooltip("Compile Code"));
 
         this.run.setGraphic(new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconsPath + "run-icon.png")))));
-        run.setTooltip(new Tooltip("Executar Código"));
+        run.setTooltip(new Tooltip("Execute Code"));
 
         this.stop.setGraphic(new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconsPath + "stop-icon.png")))));
-        stop.setTooltip(new Tooltip("Parar Execução"));
+        stop.setTooltip(new Tooltip("Stop Execution"));
     }
 
     private void initialSettings() {
