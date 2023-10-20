@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -15,20 +14,18 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 
 
 public class CompilerApplication extends Application {
 
     FileChooser fileChooser = new FileChooser();
     private static CompilerApplication instance;
+
     public static CompilerApplication getInstance() {
         return instance;
     }
 
     private File lastDirectory;
-    private static final String CONFIG_FILE = "config.properties";
-    private static final String LAST_DIRECTORY_KEY = "last_directory";
     private Stage stage;
 
     @Override
@@ -49,60 +46,64 @@ public class CompilerApplication extends Application {
     }
 
 
-    public void setLineAndColumn(TextArea codeTextArea, Text lineColumnText){
+    public void setLineAndColumn(TextArea codeTextArea, Text lineColumnText) {
         codeTextArea.caretPositionProperty().addListener((observable, oldValue, newValue) -> {
-            int caretPosition  = newValue.intValue();
-            if(caretPosition > 0){
+            int caretPosition = newValue.intValue();
+            if (caretPosition > 0) {
 
-            String text = codeTextArea.getText();
-            int currentLine = 1;
-            int currentColumn = 1;
+                String text = codeTextArea.getText();
+                int currentLine = 1;
+                int currentColumn = 1;
 
-            if (caretPosition <= text.length()) {
-                int lineStart = text.lastIndexOf('\n', caretPosition - 1) + 1;
-                currentColumn = caretPosition - lineStart + 1;
-                for (int i = 0; i < caretPosition; i++) {
-                    if (text.charAt(i) == '\n') {
-                        currentLine++;
+                if (caretPosition <= text.length()) {
+                    int lineStart = text.lastIndexOf('\n', caretPosition - 1) + 1;
+                    currentColumn = caretPosition - lineStart + 1;
+                    for (int i = 0; i < caretPosition; i++) {
+                        if (text.charAt(i) == '\n') {
+                            currentLine++;
+                        }
                     }
                 }
-            }
                 lineColumnText.setText("Ln " + currentLine + ", Col " + currentColumn);
             } else {
                 lineColumnText.setText("Ln " + 1 + ", Col " + 1);
             }
         });
     }
+
     public void updateTitle(String title) {
-        if(Objects.equals(title, "")){
+        if (Objects.equals(title, "")) {
             stage.setTitle("Compilador");
         } else {
             stage.setTitle("Compilador - " + title);
         }
     }
-    public void defineSplitPane(TextArea codeTextArea, TextArea consoleTextArea, SplitPane splitPane){
+
+    public void defineSplitPane(TextArea codeTextArea, TextArea consoleTextArea, SplitPane splitPane) {
         VBox.setVgrow(codeTextArea, Priority.ALWAYS);
         HBox.setHgrow(consoleTextArea, Priority.ALWAYS);
         splitPane.getItems().remove(0);
         splitPane.getItems().remove(0);
-        splitPane.getItems().addAll(codeTextArea,consoleTextArea);
+        splitPane.getItems().addAll(codeTextArea, consoleTextArea);
         splitPane.setDividerPosition(0, 1);
     }
-    public void autoResizeSplitPaneWidth(SplitPane splitPane, Text lineColumnText){
+
+    public void autoResizeSplitPaneWidth(SplitPane splitPane, Text lineColumnText) {
         stage.widthProperty().addListener((obs, oldWidth, newWidth) -> {
             double newTextAreaWidth = stage.getWidth() - 38;
-             splitPane.setPrefWidth(newTextAreaWidth);
-             lineColumnText.setLayoutX(10);
+            splitPane.setPrefWidth(newTextAreaWidth);
+            lineColumnText.setLayoutX(10);
         });
     }
-    public void autoResizeSplitPaneHeight(SplitPane splitPane, Text lineColumnText){
+
+    public void autoResizeSplitPaneHeight(SplitPane splitPane, Text lineColumnText) {
         stage.heightProperty().addListener((obs, oldHeight, newHeight) -> {
             splitPane.setPrefHeight(stage.getHeight() - 160);
             lineColumnText.setLayoutY(stage.getHeight() - 75);
         });
     }
 
-    public File openFile(String title){
+    public File openFile(String title) {
         fileChooser.setTitle(title);
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Text Files", "*.txt")
@@ -116,7 +117,8 @@ public class CompilerApplication extends Application {
         }
         return file;
     }
-    public File chooseFilePath(String title, String fileName){
+
+    public File chooseFilePath(String title, String fileName) {
         fileChooser.setTitle(title);
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Text Files", "*.txt")
@@ -138,8 +140,8 @@ public class CompilerApplication extends Application {
 
             Optional<ButtonType> result = alert.showAndWait();
 
-            if (result.get() == yesButton){
-                if(controller.getFile() != null) {
+            if (result.get() == yesButton) {
+                if (controller.getFile() != null) {
                     controller.saveFile(code, controller.getFile());
                     this.updateTitle(controller.getFileName());
                 } else {
@@ -147,14 +149,14 @@ public class CompilerApplication extends Application {
                     if (lastDirectory != null) {
                         fileChooser.setInitialDirectory(lastDirectory);
                     }
-                    if(newFile != null){
+                    if (newFile != null) {
                         lastDirectory = newFile.getParentFile();
                         controller.saveFile(code, newFile);
                         this.updateTitle(newFile.getName());
                     }
                 }
             } else if (result.get() == noButton) {
-                if(controller.isFileEdited()){
+                if (controller.isFileEdited()) {
                     compilerController.cancelSaveFile();
                 }
             } else {

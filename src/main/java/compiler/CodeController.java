@@ -1,16 +1,16 @@
 package compiler;
 
-import LexicalAnalysis.LexicalAnalysis;
+import parser.*;
 import javafx.scene.control.TextArea;
-import LexicalAnalysis.ParseException;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 
 import java.io.*;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 public class CodeController {
-    public LexicalAnalysis lexicalAnalysis;
+    public LangParser LangParser;
     private String code;
     private String fileName;
     private File file;
@@ -57,9 +57,9 @@ public class CodeController {
 
     public void openFile(TextArea codeTextArea, CompilerApplication screen) throws IOException {
         File file = screen.openFile("Open File");
-        if(file != null) {
+        if (file != null) {
             codeTextArea.setText("");
-            BufferedReader reader = new BufferedReader(new FileReader(file.getAbsoluteFile()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file.getAbsoluteFile()), StandardCharsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
                 this.addTextToCodeTextArea(codeTextArea, line + "\n");
@@ -83,14 +83,14 @@ public class CodeController {
         bufferedWriter.close();
     }
 
-    public void newFile(int archivesSize){
+    public void newFile(int archivesSize) {
         this.file = null;
         this.code = "";
         this.fileName = "compiler" + archivesSize + ".txt";
         this.isFileEdited = true;
     }
 
-    void copySelectedText(TextArea codeTextArea){
+    void copySelectedText(TextArea codeTextArea) {
         String selectedText = codeTextArea.getSelectedText();
         if (selectedText != null && !selectedText.isEmpty()) {
             ClipboardContent content = new ClipboardContent();
@@ -99,7 +99,7 @@ public class CodeController {
         }
     }
 
-    void cutSelectedText(TextArea codeTextArea){
+    void cutSelectedText(TextArea codeTextArea) {
         String selectedText = codeTextArea.getSelectedText();
         if (selectedText != null && !selectedText.isEmpty()) {
             ClipboardContent content = new ClipboardContent();
@@ -111,7 +111,7 @@ public class CodeController {
         }
     }
 
-    void deleteSelectedText(TextArea codeTextArea){
+    void deleteSelectedText(TextArea codeTextArea) {
         String selectedText = codeTextArea.getSelectedText();
         if (selectedText != null && !selectedText.isEmpty()) {
             int start = codeTextArea.getSelection().getStart();
@@ -120,43 +120,56 @@ public class CodeController {
         }
     }
 
-    void pasteSelectedText(TextArea codeTextArea){
+    void pasteSelectedText(TextArea codeTextArea) {
         if (clipboard.hasString()) {
             String clipboardText = clipboard.getString();
             codeTextArea.insertText(codeTextArea.getCaretPosition(), clipboardText);
         }
     }
 
-    void selectAllText(TextArea codeTextArea){
+    void selectAllText(TextArea codeTextArea) {
         codeTextArea.selectAll();
     }
 
-    void deselectAllText(TextArea codeTextArea){
+    void deselectAllText(TextArea codeTextArea) {
         codeTextArea.deselect();
     }
 
-    void addTextToCodeTextArea(TextArea codeTextArea, String text){
-        codeTextArea.setText(codeTextArea.getText() + text);
+    void addTextToCodeTextArea(TextArea codeTextArea, String text) {
+        codeTextArea.appendText(text);
     }
 
-    void eraseCodeTextArea(TextArea codeTextArea){
+    void eraseCodeTextArea(TextArea codeTextArea) {
         codeTextArea.setText("");
     }
 
-    void compile(String code, TextArea consoleTextArea) {
-        LexicalAnalysis parser = null;
-       try {
-           parser = new LexicalAnalysis(new BufferedReader(new StringReader(code)));
-           parser.MainRule();
-           consoleTextArea.setText(consoleTextArea.getText() + parser.getResult());
-       } catch (ParseException e){
-           consoleTextArea.setText(consoleTextArea.getText() + parser.getResult() + e.getMessage());
-       }
+    void compile(TextArea code, TextArea consoleTextArea) {
+        LangParser parser = null;
+        try {
+            parser = new LangParser(new ByteArrayInputStream(code.getText().getBytes()));
+            parser.lexicalAnalyzer();
+            consoleTextArea.setText(consoleTextArea.getText() + parser.getResult());
+            if (parser.isValidLexical()) {
+                parser = new LangParser(new ByteArrayInputStream(code.getText().getBytes()));
+                parser.setOutput(new ArrayList<ErrorStruct>());
+                parser.syntaxAnalyzer();
+                if (parser.isValidSyntax()) {
+                    consoleTextArea.appendText("The code was compiled successfully\n");
+                } else {
+                    consoleTextArea.appendText("Found " + parser.getOutput().size() + " syntactic errors:\n");
+                    for (ErrorStruct err : parser.getOutput()) {
+                        consoleTextArea.appendText("Error: " + err.getMsg() + " located at [line:" + err.getError().currentToken.beginLine + "| column: "
+                                + err.getError().currentToken.endColumn + "] expected:" + err.expected() + "\n");
+                    }
+                }
+            } else {
+                consoleTextArea.appendText("The lexical analyzer encountered a problem and was unable to continue parsing\n");
+            }
+        } catch (ParseException e) {
+            consoleTextArea.setText(consoleTextArea.getText() + parser.getResult() + e.getMessage());
+        }
 
     }
-
-
-
 
 
 }

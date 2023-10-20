@@ -1,5 +1,5 @@
 package compiler;
-import LexicalAnalysis.ParseException;
+import parser.ParseException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -198,7 +198,7 @@ public class CompilerController  implements Initializable {
     @FXML
     void onClickCompile(ActionEvent event) throws ParseException {
         this.consoleTextArea.setText("");
-        this.codeController.compile(this.codeTextArea.getText(), consoleTextArea);
+        this.codeController.compile(this.codeTextArea, consoleTextArea);
     }
 
 
@@ -291,7 +291,7 @@ public class CompilerController  implements Initializable {
     @FXML
     void menuBarCompileOnClick(ActionEvent event) {
         this.consoleTextArea.setText("");
-        this.codeController.compile(this.codeTextArea.getText(), consoleTextArea);
+        this.codeController.compile(this.codeTextArea, consoleTextArea);
     }
 
     @FXML
