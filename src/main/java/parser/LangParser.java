@@ -361,7 +361,7 @@ output.add(new ErrorStruct("Incorrect identifier list", e));
       identifiersList();
       jj_consume_token(IS);
       typeConstant();
-      jj_consume_token(EQUAL);
+      jj_consume_token(ATTRIBUTION);
       constantResult();
       jj_consume_token(DOT);
     } finally {

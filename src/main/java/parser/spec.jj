@@ -335,7 +335,7 @@ void constantResult() : {} {
 }
 
 void constantDeclaration() : {} {
-    identifiersList() <IS> typeConstant()   <EQUAL> constantResult() <DOT>
+    identifiersList() <IS> typeConstant() <ATTRIBUTION> constantResult() <DOT>
 }
 
 
