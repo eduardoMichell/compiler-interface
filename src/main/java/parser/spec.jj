@@ -75,7 +75,7 @@ public class LangParser {
         }
 
         public boolean isValidSemantic(){
-            return languageRules.haveError();
+            return !languageRules.haveError();
         }
 
         public static void main(String[] args) throws ParseException, IOException {
@@ -451,14 +451,39 @@ TOKEN : {
     | <LETTER: ["A"-"Z","a"-"z"]>
 }
 
-
-void continuationInnerEnumDeclaration() : { Token t; } {
-    <IDENTIFIER> addRule("#4", t) (<SEMI_COLUMN> (<LITERAL_CONSTANT> | <INTEGER_NUMERICAL_CONSTANT> | <REAL_NUMERICAL_CONSTANT> | <IDENTIFIER>) continuationInnerEnumDeclaration())?
+void declarations(RecoverySet r) : {} {
+    try {
+        (<DECLARATION> declarationOne(r))*
+    } catch (ParseException e) {
+        output.add(new ErrorStruct("Invalid enum/variable declaration", e));
+        consumeUntil(r, e);
+        validSyntax = false;
+    }
 }
 
-void innerEnumDeclaration(RecoverySet r) : { Token t; } {
+void declarationOne(RecoverySet r) : {} {
     try {
-        <IDENTIFIER> addRule("#3", t) <IS> <OPEN_KEYS> ( <LITERAL_CONSTANT> | <INTEGER_NUMERICAL_CONSTANT> | <REAL_NUMERICAL_CONSTANT> | <IDENTIFIER>) continuationInnerEnumDeclaration() <CLOSE_KEYS> <DOT>
+       <TYPE> <OPEN_BOX> enumDeclaration(r) <CLOSE_BOX> declarationTwo(r) | declarationConstantsAndVariables(r)
+    } catch (ParseException e) {
+        output.add(new ErrorStruct("Invalid enum/variable declaration", e));
+        consumeUntil(r, e);
+        validSyntax = false;
+    }
+}
+
+void declarationTwo(RecoverySet r) : {} {
+    try {
+       (<DECLARATION> declarationConstantsAndVariables(r))
+    } catch (ParseException e) {
+        output.add(new ErrorStruct("Invalid variable declaration", e));
+        consumeUntil(r, e);
+        validSyntax = false;
+    }
+}
+
+void enumDeclaration(RecoverySet r) : { Token t;  } {
+    try {
+        <IDENTIFIER> addRule("#3", t) <IS> <OPEN_KEYS> innerEnumDeclaration() <CLOSE_KEYS> <DOT> enumDeclarationOne(r)
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid enum declaration", e));
         consumeUntil(r, e);
@@ -466,18 +491,25 @@ void innerEnumDeclaration(RecoverySet r) : { Token t; } {
     }
 }
 
-void enumDeclaration(RecoverySet r) : {} {
+void enumDeclarationOne(RecoverySet r) : {} {
     try {
-        <TYPE> <OPEN_BOX>
-            (innerEnumDeclaration(r))+
-        <CLOSE_BOX>
-        (<DECLARATION> declarationConstantsAndVariables(r))?
+        (enumDeclaration(r))*
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid enum declaration", e));
         consumeUntil(r, e);
         validSyntax = false;
     }
 }
+
+
+void innerEnumDeclaration() : { Token t; } {
+    <IDENTIFIER> addRule("#4", t)  innerEnumDeclarationOne()
+}
+
+void innerEnumDeclarationOne() : {} {
+     (<SEMI_COLUMN> innerEnumDeclaration())*
+}
+
 
 void index() : { Token t; } {
     (<OPEN_KEYS> <INTEGER_NUMERICAL_CONSTANT> addRule("#12", t) <CLOSE_KEYS>)?
@@ -615,16 +647,6 @@ void header(RecoverySet r):  { Token t; }
         <DO> <THIS> <IDENTIFIER> addRule("#1", t) <OPEN_BOX> <CLOSE_BOX>
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid program header declaration", e));
-        consumeUntil(r, e);
-        validSyntax = false;
-    }
-}
-
-void declarations(RecoverySet r) : {} {
-    try {
-        (<DECLARATION> (enumDeclaration(r) | declarationConstantsAndVariables(r)))?
-    } catch (ParseException e) {
-        output.add(new ErrorStruct("Invalid enum/variable declaration", e));
         consumeUntil(r, e);
         validSyntax = false;
     }

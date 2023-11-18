@@ -181,7 +181,6 @@ public class LanguageRules {
 
     public void rule4(Token token) {
         String identifier = token.image;
-        System.out.println(isSymbolPresent(identifier));
         if (isSymbolPresent(identifier) || isPresentEnumSymbolTable(identifier) || isPresentEnumIdentifierList(identifier)) {
             error.add("Error: Identifier '" + identifier + "' already declared"
                     + " - located at [line:" + token.beginLine + "| column: " + token.endColumn + "]");
@@ -697,7 +696,8 @@ public class LanguageRules {
     }
 
     public void rule51() {
-        Symbol objIdentifierRule24 = recoverSymbol(identifierRule24.image);
+        Symbol objIdentifierRule24 = recoverSymbol(identifierRule24 != null ? identifierRule24.image : null);
+        if(!haveError){
         if (!indexedVariable) {
             if (objIdentifierRule24 != null && objIdentifierRule24.getAttrTwo().equals("-")) {
                 instructionStack.add(new Instruction(pointer, "LDV", objIdentifierRule24.getAttrOne()));
@@ -717,6 +717,7 @@ public class LanguageRules {
                         + " - located at [line:" + identifierRule24.beginLine + "| column: " + identifierRule24.endColumn + "]");
                 haveError = true;
             }
+        }
         }
         printInstructions();
     }

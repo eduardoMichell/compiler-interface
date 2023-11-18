@@ -160,7 +160,6 @@ public class CodeController {
                         screen.openTable(parser.getSemanticInstructions());
                     } else {
                         consoleTextArea.appendText("Found semantic errors:\n");
-
                         for (String err : parser.getSemanticErrors()) {
                             consoleTextArea.appendText(err + "\n");
                         }
