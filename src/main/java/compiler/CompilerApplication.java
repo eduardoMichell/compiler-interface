@@ -1,17 +1,26 @@
 package compiler;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import parser.Instruction;
 
 import java.io.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -165,6 +174,36 @@ public class CompilerApplication extends Application {
             e.printStackTrace();
         }
     }
+
+    public void openTable(List<Instruction> instructions) {
+        Stage newStage = new Stage();
+        newStage.initModality(Modality.APPLICATION_MODAL);
+        TableView<Instruction> table =  new TableView();
+
+        TableColumn<Instruction, Integer> pointerColumn = new TableColumn<>("Pointer");
+        pointerColumn.setCellValueFactory(new PropertyValueFactory<>("pointer"));
+
+        TableColumn<Instruction, String> codeColumn = new TableColumn<>("Code");
+        codeColumn.setCellValueFactory(new PropertyValueFactory<>("code"));
+
+        TableColumn<Instruction, String> addressColumn = new TableColumn<>("Address");
+        addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
+
+        table.getColumns().addAll(pointerColumn, codeColumn, addressColumn);
+
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        for (Instruction inst : instructions){
+            table.getItems().add(inst);
+        }
+
+        Scene tableScene = new Scene(table, 300, 220);
+        newStage.setScene(tableScene);
+        newStage.setTitle("Object Code");
+        newStage.show();
+    }
+
+
 
     public static void main(String[] args) {
         launch();

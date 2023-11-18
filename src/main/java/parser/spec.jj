@@ -10,7 +10,9 @@ options {
 PARSER_BEGIN(LangParser)
 import java.io.*;
 import parser.First;
+import parser.Instruction;
 import parser.RecoverySet;
+import parser.LanguageRules;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -20,6 +22,9 @@ public class LangParser {
         private boolean validLexical = true;
         private boolean validSyntax = true;
         static List<ErrorStruct> output = new ArrayList<ErrorStruct>();
+        static List<String> commandList = new ArrayList<String>();
+        static List<String> paramList = new ArrayList<String>();
+        static LanguageRules languageRules = new LanguageRules();
         boolean eof;
 
         public String getResult(){
@@ -58,6 +63,21 @@ public class LangParser {
             this.result += msg + " (" + t.image + ") located at [line:"+t.beginLine+"| column:"+t.beginColumn+"]\n";
         }
 
+        public void eraseSemanticRules(){
+            languageRules = new LanguageRules();
+        }
+        public List<Instruction> getSemanticInstructions(){
+            return languageRules.getInstructionStack();
+        }
+
+        public List<String> getSemanticErrors(){
+            return languageRules.getError();
+        }
+
+        public boolean isValidSemantic(){
+            return languageRules.haveError();
+        }
+
         public static void main(String[] args) throws ParseException, IOException {
             try {
                 LangParser parser = new LangParser(
@@ -70,6 +90,176 @@ public class LangParser {
             } catch (ParseException e) {
             }
         }
+
+       public static void addRule(String rule, Token t) throws ParseException {
+            switch(rule){
+                case "#1":
+                      languageRules.rule1(t);
+                      break;
+                case "#2":
+                      languageRules.rule2();
+                      break;
+                case "#3":
+                       languageRules.rule3(t);
+                      break;
+                case "#4":
+                       languageRules.rule4(t);
+                      break;
+                case "#5":
+                       languageRules.rule5();
+                      break;
+                case "#6":
+                       languageRules.rule6();
+                      break;
+                case "#7":
+                       languageRules.rule7(t);
+                      break;
+                case "#8":
+                       languageRules.rule8();
+                      break;
+                case "#9":
+                       languageRules.rule9(t);
+                      break;
+                case "#10":
+                       languageRules.rule10(t);
+                      break;
+                case "#11":
+                       languageRules.rule11();
+                      break;
+                case "#12":
+                       languageRules.rule12(t);
+                      break;
+                case "#13":
+                       languageRules.rule13();
+                      break;
+                case "#14":
+                       languageRules.rule14();
+                      break;
+                case "#15":
+                       languageRules.rule15();
+                      break;
+                case "#16":
+                       languageRules.rule16();
+                      break;
+                case "#17":
+                       languageRules.rule17();
+                      break;
+                case "#18":
+                       languageRules.rule18();
+                      break;
+                case "#19":
+                       languageRules.rule19();
+                      break;
+                case "#20":
+                       languageRules.rule20();
+                      break;
+                case "#21":
+                       languageRules.rule21();
+                      break;
+                case "#22":
+                       languageRules.rule22();
+                      break;
+                case "#23":
+                       languageRules.rule23();
+                      break;
+                case "#24":
+                       languageRules.rule24(t);
+                      break;
+                case "#25":
+                       languageRules.rule25();
+                      break;
+                case "#26":
+                       languageRules.rule26(t);
+                      break;
+                case "#27":
+                       languageRules.rule27(t);
+                      break;
+                case "#28":
+                       languageRules.rule28(t);
+                      break;
+                case "#29":
+                       languageRules.rule29();
+                      break;
+                case "#30":
+                       languageRules.rule30();
+                      break;
+                case "#31":
+                       languageRules.rule31();
+                      break;
+                case "#32":
+                       languageRules.rule32();
+                      break;
+                case "#33":
+                       languageRules.rule33();
+                      break;
+                case "#34":
+                       languageRules.rule34();
+                      break;
+                case "#35":
+                       languageRules.rule35();
+                      break;
+                case "#36":
+                       languageRules.rule36();
+                      break;
+                case "#37":
+                       languageRules.rule37();
+                      break;
+                case "#38":
+                       languageRules.rule38();
+                      break;
+                case "#39":
+                       languageRules.rule39();
+                      break;
+                case "#40":
+                       languageRules.rule40();
+                      break;
+                case "#41":
+                       languageRules.rule41();
+                      break;
+                case "#42":
+                       languageRules.rule42();
+                      break;
+                case "#43":
+                       languageRules.rule43();
+                      break;
+                case "#44":
+                       languageRules.rule44();
+                      break;
+                case "#45":
+                       languageRules.rule45();
+                      break;
+                case "#46":
+                       languageRules.rule46();
+                      break;
+                case "#47":
+                       languageRules.rule47();
+                      break;
+                case "#48":
+                       languageRules.rule48();
+                      break;
+                case "#49":
+                       languageRules.rule49();
+                      break;
+                case "#50":
+                       languageRules.rule50();
+                       break;
+                case "#51":
+                       languageRules.rule51();
+                       break;
+                case "#52":
+                       languageRules.rule52();
+                       break;
+                case "#53":
+                       languageRules.rule53();
+                       break;
+                case "#54":
+                       languageRules.rule54();
+                       break;
+
+                default :
+                      break;
+                }
+              }
 
         static public String im(int x){
                 String s = tokenImage[x];
@@ -99,7 +289,6 @@ public class LangParser {
             }
             contParseError++;
        }
-
 }
 PARSER_END(LangParser)
 
@@ -231,8 +420,6 @@ SKIP : {
     | (<DIGIT>)+ (
           <SYMBOL> (<SYMBOL> | <LETTER>)*
         | <LETTER> (<SYMBOL> | <LETTER>)*)>
-
-
 }
 
 TOKEN : {
@@ -244,18 +431,12 @@ TOKEN : {
 
 TOKEN : {
       <INTEGER_NUMERICAL_CONSTANT : <DIGIT> (<DIGIT>)? (<DIGIT>)?>
-    | <REAL_NUMERICAL_CONSTANT : <DIGIT> (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? "." <DIGIT>(<DIGIT>)? (<DIGIT>)?>
+    | <REAL_NUMERICAL_CONSTANT : <DIGIT> (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? "." <DIGIT> (<DIGIT>)? (<DIGIT>)?>
 
     | <INVALID_INTEGER_NUMERICAL_CONSTANT : <DIGIT> <DIGIT> <DIGIT> (<DIGIT>)+>
     | <INVALID_REAL_NUMERICAL_CONSTANT : (
-        <DIGIT> (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? ("." | ",")  <DIGIT> (<DIGIT>)? (<DIGIT>)? (("." | ",") | <DIGIT>)* |
-        <DIGIT> <DIGIT> <DIGIT> <DIGIT> <DIGIT> (<DIGIT>)+  ("." | ",") <DIGIT> <DIGIT> <DIGIT> (<DIGIT>)+ (("." | ",") | <DIGIT>)*  |
-        <DIGIT> <DIGIT> <DIGIT> <DIGIT> <DIGIT> (<DIGIT>)+  ("." | ",") <DIGIT> (<DIGIT>)? (<DIGIT>)? (("." | ",") | <DIGIT>)*  |
-        <DIGIT> (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? (<DIGIT>)?  ("." | ",") <DIGIT> <DIGIT> <DIGIT> (<DIGIT>)+ (("." | ",") | <DIGIT>)*  |
-        <DIGIT> <DIGIT> <DIGIT> <DIGIT> <DIGIT> (<DIGIT>)+  ("." | ",") |
-            ("." | ",") <DIGIT> <DIGIT> <DIGIT> (<DIGIT>)+ (("." | ",") | <DIGIT>)* |
-        <DIGIT> (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? (<DIGIT>)?  ("." | ",") |
-            ("." | ",") <DIGIT>(<DIGIT>)? (<DIGIT>)? (("." | ",") | <DIGIT>)*)>
+         <DIGIT> (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? (<DIGIT>)? ("." | ",")  <DIGIT> <DIGIT> <DIGIT> (<DIGIT>)+
+       | <DIGIT> <DIGIT> <DIGIT> <DIGIT> <DIGIT> (<DIGIT>)+  ("." | ",") <DIGIT> (<DIGIT>)? (<DIGIT>)? )>
 }
 
 TOKEN : {
@@ -270,16 +451,14 @@ TOKEN : {
     | <LETTER: ["A"-"Z","a"-"z"]>
 }
 
-void enum_values(): {} {
-    constantResult() | <IDENTIFIER>
-}
-void continuationInnerEnumDeclaration() : {} {
-    (<SEMI_COLUMN> enum_values() continuationInnerEnumDeclaration())?
+
+void continuationInnerEnumDeclaration() : { Token t; } {
+    <IDENTIFIER> addRule("#4", t) (<SEMI_COLUMN> (<LITERAL_CONSTANT> | <INTEGER_NUMERICAL_CONSTANT> | <REAL_NUMERICAL_CONSTANT> | <IDENTIFIER>) continuationInnerEnumDeclaration())?
 }
 
-void innerEnumDeclaration(RecoverySet r) : {} {
+void innerEnumDeclaration(RecoverySet r) : { Token t; } {
     try {
-        <IDENTIFIER>  <IS> <OPEN_KEYS> enum_values() continuationInnerEnumDeclaration() <CLOSE_KEYS> <DOT>
+        <IDENTIFIER> addRule("#3", t) <IS> <OPEN_KEYS> ( <LITERAL_CONSTANT> | <INTEGER_NUMERICAL_CONSTANT> | <REAL_NUMERICAL_CONSTANT> | <IDENTIFIER>) continuationInnerEnumDeclaration() <CLOSE_KEYS> <DOT>
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid enum declaration", e));
         consumeUntil(r, e);
@@ -300,17 +479,47 @@ void enumDeclaration(RecoverySet r) : {} {
     }
 }
 
-void index() : {} {
-    (<OPEN_KEYS> <INTEGER_NUMERICAL_CONSTANT> <CLOSE_KEYS> )?
+void index() : { Token t; } {
+    (<OPEN_KEYS> <INTEGER_NUMERICAL_CONSTANT> addRule("#12", t) <CLOSE_KEYS>)?
 }
 
-void identifiers() : {} {
-    <IDENTIFIER>  index()
+void item() : { Token t; } {
+      <IDENTIFIER> addRule("#24", t) index() addRule("#25", null)
+    | <INTEGER_NUMERICAL_CONSTANT>  addRule("#26", t)
+    | <REAL_NUMERICAL_CONSTANT>  addRule("#27", t)
+    | <LITERAL_CONSTANT>  addRule("#28", t)
 }
 
-void identifiersList() : {} {
+void identifierVariableList() : { Token t; } {
     try {
-        identifiers() (<SEMI_COLUMN> identifiers())*
+        <IDENTIFIER> addRule("#10", t) index() addRule("#11", null) (identifierVariableOne())*
+    } catch (ParseException e){
+        output.add(new ErrorStruct("Incorrect identifier variable", e));
+        validSyntax = false;
+    }
+}
+
+void identifierVariableOne() : {} {
+    try {
+        <SEMI_COLUMN> identifierVariableList()
+    } catch (ParseException e){
+        output.add(new ErrorStruct("Incorrect identifier variable", e));
+        validSyntax = false;
+    }
+}
+
+void identifierConstantList() : { Token t; } {
+    try {
+        <IDENTIFIER> addRule("#9", t) (identifierConstantOne())*
+    } catch (ParseException e){
+        output.add(new ErrorStruct("Incorrect identifier list", e));
+        validSyntax = false;
+    }
+}
+
+void identifierConstantOne() : {} {
+    try {
+        <SEMI_COLUMN> identifierConstantList()
     } catch (ParseException e){
         output.add(new ErrorStruct("Incorrect identifier list", e));
         validSyntax = false;
@@ -318,66 +527,61 @@ void identifiersList() : {} {
 }
 
 void typeDeclaration() : {} {
-    <INTEGER> | <REAL> | <STRING> | <LOGIC> | <ENUM>
+    <INTEGER> addRule("#13", null) | <REAL> addRule("#14", null) | <STRING> addRule("#15", null) | <LOGIC> addRule("#16", null) | <IDENTIFIER> addRule("#17", null)
 }
-
 
 void variableDeclaration() : {} {
-    identifiersList() <IS> typeDeclaration() <DOT>
+   identifierVariableList() <IS> typeDeclaration() addRule("#6", null) <DOT> (variableDeclarationOne())*
 }
 
-void typeConstant() : {} {
-    <INTEGER> | <REAL> | <STRING> | <LOGIC>
+void variableDeclarationOne() : {} {
+   variableDeclaration()
 }
 
-void constantResult() : {} {
-    <LITERAL_CONSTANT> | <INTEGER_NUMERICAL_CONSTANT> | <REAL_NUMERICAL_CONSTANT>
+void constantDeclaration() : { Token t; } {
+   identifierConstantList() <IS>  typeDeclaration() addRule("#6", null) <ATTRIBUTION>
+   (<LITERAL_CONSTANT> | <INTEGER_NUMERICAL_CONSTANT> | <REAL_NUMERICAL_CONSTANT>) addRule("#7", t) <DOT> (constantDeclarationOne())*
 }
 
-void constantDeclaration() : {} {
-    identifiersList() <IS> typeConstant() <ATTRIBUTION> constantResult() <DOT>
+void constantDeclarationOne() : { Token t; } {
+   constantDeclaration()
 }
-
 
 void endConstant() : {} {
-    <AS> <CONSTANT> (constantDeclaration())+
+    <AS> startConstant()
 }
 
 void startVariable() : {} {
-    <VARIABLE> (variableDeclaration())+ (endConstant())?
+    <VARIABLE> addRule("#8", null) variableDeclaration()
+}
+
+void startConstant() : {} {
+    <CONSTANT> addRule("#5", null) (constantDeclaration())+
 }
 
 void endVariable() : {} {
-    <AS> <VARIABLE> (variableDeclaration())+
-}
-
-
-void startConstant() : {} {
-    <CONSTANT> (constantDeclaration())+ (endVariable())?
+    <AS> startVariable()
 }
 
 void startDeclaration(RecoverySet r) : {} {
     try {
-        startVariable() | startConstant()
+        startVariable() (endConstant())? | startConstant() (endVariable())?
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid body declaration", e));
         consumeUntil(r, e);
         validSyntax = false;
     }
 }
-
 
 void innerDeclaration(RecoverySet r) : {} {
     try {
-        <AS>  startDeclaration(r)
+        <AS> startDeclaration(r)
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid body declaration", e));
         consumeUntil(r, e);
         validSyntax = false;
     }
 }
-
-
 
 void declarationConstantsAndVariables(RecoverySet r) : {} {
     try{
@@ -389,8 +593,12 @@ void declarationConstantsAndVariables(RecoverySet r) : {} {
     }
 }
 
-void identifierList(): {} {
-    constants() (<SEMI_COLUMN> constants())*
+void identifierConstantAndVariableList(): {} {
+    item() addRule("#23", null) (identifierConstantAndVariable())*
+}
+
+void identifierConstantAndVariable(): {} {
+    <SEMI_COLUMN> identifierConstantAndVariableList()
 }
 
 void constants(): {} {
@@ -401,10 +609,10 @@ void numericConstant(): {} {
     <INTEGER_NUMERICAL_CONSTANT> | <REAL_NUMERICAL_CONSTANT>
 }
 
-void header(RecoverySet r):  {}
+void header(RecoverySet r):  { Token t; }
 {
     try {
-        <DO> <THIS> <IDENTIFIER> <OPEN_BOX> <CLOSE_BOX>
+        <DO> <THIS> <IDENTIFIER> addRule("#1", t) <OPEN_BOX> <CLOSE_BOX>
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid program header declaration", e));
         consumeUntil(r, e);
@@ -421,12 +629,12 @@ void declarations(RecoverySet r) : {} {
         validSyntax = false;
     }
 }
-void expressionContinuation(RecoverySet g) : {} {
-    ((<EQUAL> arithmeticOrLogicExpression(g))  | (<NOT_EQUAL> arithmeticOrLogicExpression(g))  | (<LESS_THEN> arithmeticOrLogicExpression(g))  |
-    (<GREATER_THEN> arithmeticOrLogicExpression(g))  | (<LESS_EQUALS> arithmeticOrLogicExpression(g)) |
-    (<GREATER_EQUALS> arithmeticOrLogicExpression(g)) )?
-}
 
+void expressionContinuation(RecoverySet g) : {} {
+    ((<EQUAL> arithmeticOrLogicExpression(g)) addRule("#36", null) | (<NOT_EQUAL> arithmeticOrLogicExpression(g)) addRule("#37", null)
+    | (<LESS_THEN> arithmeticOrLogicExpression(g)) addRule("#38", null) | (<GREATER_THEN> arithmeticOrLogicExpression(g)) addRule("#39", null)
+    | (<LESS_EQUALS> arithmeticOrLogicExpression(g)) addRule("#40", null) | (<GREATER_EQUALS> arithmeticOrLogicExpression(g)) addRule("#41", null))?
+}
 
 void expression(RecoverySet g) : {} {
     try {
@@ -450,24 +658,25 @@ void secondTerm(RecoverySet g) : {} {
     firstTerm(g) mediumPriorityOperators(g)
 }
 
-void element(RecoverySet g) : {} {
-    (<IDENTIFIER> index())
-    | <INTEGER_NUMERICAL_CONSTANT>  | <REAL_NUMERICAL_CONSTANT>  | <LITERAL_CONSTANT>
-    | <TRUE> | <UNTRUE> | (<OPEN_BRACKETS> expression(g) <CLOSE_BRACKETS> )
-    | (<NEGATE_LOGIC> <OPEN_BRACKETS> expression(g) <CLOSE_BRACKETS> )
+void element(RecoverySet g) : { Token t; } {
+    (<IDENTIFIER> addRule("#24", t)  index() addRule("#51", null) )
+    | <INTEGER_NUMERICAL_CONSTANT> addRule("#26", t) | <REAL_NUMERICAL_CONSTANT> addRule("#27", t) | <LITERAL_CONSTANT> addRule("#28", t)
+    | <TRUE> addRule("#52", null) | <UNTRUE> addRule("#53", null) | (<OPEN_BRACKETS> expression(g) <CLOSE_BRACKETS> )
+    | (<NEGATE_LOGIC> <OPEN_BRACKETS> expression(g) <CLOSE_BRACKETS> addRule("#54", null))
 }
 
-
 void topPriorityOperators(RecoverySet g) : {} {
-    (<POTENCE> element(g) )*
+    (<POTENCE> element(g) addRule("#50", null))*
 }
 
 void mediumPriorityOperators(RecoverySet g) : {} {
-    ((<MULTIPLY> firstTerm(g)) | (<DIVISION> firstTerm(g))  | (<INTEGER_DIVISION> firstTerm(g))  | (<DIVISION_REMAINDER> firstTerm(g))  | (<AND_LOGIC> firstTerm(g)))*
+    ((<MULTIPLY> firstTerm(g)) addRule("#45", null) | (<DIVISION> firstTerm(g)) addRule("#46", null)
+    | (<INTEGER_DIVISION> firstTerm(g)) addRule("#47", null) | (<DIVISION_REMAINDER> firstTerm(g)) addRule("#48", null)
+    | (<AND_LOGIC> firstTerm(g)) addRule("#49", null))*
 }
 
 void lesserPriorityOperators(RecoverySet g) : {} {
-    ((<PLUS> secondTerm(g)) | (<MINUS> secondTerm(g)) | (<OR_LOGIC> secondTerm(g)))*
+    ((<PLUS> secondTerm(g)) addRule("#42", null) | (<MINUS> secondTerm(g)) addRule("#43", null) | (<OR_LOGIC> secondTerm(g)) addRule("#44", null))*
 }
 
 void repeat(RecoverySet r) : {
@@ -475,9 +684,9 @@ void repeat(RecoverySet r) : {
     RecoverySet h = new RecoverySet(CLOSE_BOX);
 } {
     try {
-        <REPEAT> <THIS>   expression(g)   <OPEN_BOX>
+        <REPEAT> <THIS> addRule("#33", null) expression(g) addRule("#34", null) <OPEN_BOX>
             commandList(h)
-        <CLOSE_BOX> <DOT>
+        <CLOSE_BOX> addRule("#35", null) <DOT>
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid repeat command declaration", e));
         consumeUntil(r, e);
@@ -487,7 +696,8 @@ void repeat(RecoverySet r) : {
 
 void logicResult(RecoverySet r) : { RecoverySet g = new RecoverySet(CLOSE_BOX); } {
     try {
-        <TRUE> <RESULT>  <OPEN_BOX> commandList(g) <CLOSE_BOX> continuationTrueResult() | <UNTRUE> <RESULT> <OPEN_BOX> commandList(g) <CLOSE_BOX> continuationUntrueResult()
+          <TRUE> <RESULT> addRule("#30", null) <OPEN_BOX> commandList(g) <CLOSE_BOX> continuationTrueResult() <DOT>
+        | <UNTRUE> <RESULT> addRule("#31", null) <OPEN_BOX> commandList(g) <CLOSE_BOX> continuationUntrueResult()  <DOT>
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid avaliate bory logic result declaration", e));
         consumeUntil(r, e);
@@ -495,10 +705,9 @@ void logicResult(RecoverySet r) : { RecoverySet g = new RecoverySet(CLOSE_BOX); 
     }
 }
 
-
 void continuationTrueResult() : { RecoverySet g = new RecoverySet(CLOSE_BOX); } {
     try {
-        (<UNTRUE> <RESULT>  <OPEN_BOX> commandList(g) <CLOSE_BOX> <DOT>) | <DOT>
+        (<UNTRUE> <RESULT> addRule("#32", null) <OPEN_BOX> commandList(g) <CLOSE_BOX>)
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid avaliate bory logic result declaration", e));
         consumeUntil(g, e);
@@ -508,7 +717,7 @@ void continuationTrueResult() : { RecoverySet g = new RecoverySet(CLOSE_BOX); } 
 
 void continuationUntrueResult() : { RecoverySet g = new RecoverySet(CLOSE_BOX); } {
     try {
-        (<TRUE> <RESULT>  <OPEN_BOX> commandList(g) <CLOSE_BOX> <DOT>) | <DOT>
+        (<TRUE> <RESULT> addRule("#32", null) <OPEN_BOX> commandList(g) <CLOSE_BOX>)
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid avaliate bory logic result declaration", e));
         consumeUntil(g, e);
@@ -519,7 +728,7 @@ void continuationUntrueResult() : { RecoverySet g = new RecoverySet(CLOSE_BOX); 
 void avaliate(RecoverySet r) : { RecoverySet g = new RecoverySet(DOT); } {
     try {
         <AVALIATE> <THIS> expression(First.avaliate)
-            logicResult(g)
+            logicResult(g) addRule("#29", null)
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid avaliate command declaration", e));
         consumeUntil(r, e);
@@ -529,7 +738,7 @@ void avaliate(RecoverySet r) : { RecoverySet g = new RecoverySet(DOT); } {
 
 void write(RecoverySet g) : {} {
     try {
-        <THIS> <OPEN_BOX> writeBody() <CLOSE_BOX> <DOT>
+        <THIS> addRule("#22", null) <OPEN_BOX> identifierConstantAndVariableList() <CLOSE_BOX> <DOT>
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid write command declaration", e));
         consumeUntil(g, e);
@@ -539,7 +748,7 @@ void write(RecoverySet g) : {} {
 
 void writeAll(RecoverySet g) : {} {
    try {
-        <ALL> <THIS> <OPEN_BOX> writeBody() <CLOSE_BOX> <DOT>
+        <ALL> <THIS> addRule("#21", null) <OPEN_BOX> identifierConstantAndVariableList() <CLOSE_BOX> <DOT>
    } catch (ParseException e){
         output.add(new ErrorStruct("Invalid write all command declaration", e));
         consumeUntil(g, e);
@@ -547,27 +756,9 @@ void writeAll(RecoverySet g) : {} {
    }
 }
 
-void writeBody() : {} {
-    try {
-        (constantResult()  (<SEMI_COLUMN> continuationWriteBody())* | identifiers()  (<SEMI_COLUMN> continuationWriteBody())*)
-    } catch (ParseException e){
-        output.add(new ErrorStruct("Invalid write body declaration", e));
-        validSyntax = false;
-   }
-}
-
-void continuationWriteBody() : {} {
-    try {
-        constantResult() | identifiers()
-    } catch (ParseException e){
-        output.add(new ErrorStruct("Invalid write body declaration", e));
-        validSyntax = false;
-    }
-}
-
 void designate(RecoverySet r) : { RecoverySet h = new RecoverySet(DOT); } {
     try {
-        <DESIGNATE> <THIS>  identifiersList() <AS> expression(h) <DOT>
+        <DESIGNATE> <THIS> addRule("#18", null) identifierVariableList() <AS> expression(h) addRule("#19", null) <DOT>
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid designate command declaration", e));
         consumeUntil(r, e);
@@ -577,7 +768,7 @@ void designate(RecoverySet r) : { RecoverySet h = new RecoverySet(DOT); } {
 
 void read(RecoverySet r) : {} {
     try {
-        <READ> <THIS>  <OPEN_BOX> identifiersList() <CLOSE_BOX> <DOT>
+        <READ> <THIS> addRule("#20", null) <OPEN_BOX> identifierVariableList() <CLOSE_BOX> <DOT>
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid read command declaration", e));
         consumeUntil(r, e);
@@ -627,7 +818,7 @@ void parser(RecoverySet r) : {
         header(i)
         declarations(h)
         body(r.union(l))
-        desc(r)
+        desc(r) addRule("#2", null)
     } catch (ParseException e){
         consumeUntil(r, e);
         validSyntax = false;
@@ -646,10 +837,17 @@ void syntaxAnalyzer() : {
     }
 }
 
-
 void lexicalAnalyzer() : {} {
     (lexer())*
     <EOF>
+}
+
+void addRule(String rule, Token t) : {} {
+try {
+	{}
+    } catch (ParseException e) {
+        output.add(new ErrorStruct("", null));
+    }
 }
 
 void lexer() : {

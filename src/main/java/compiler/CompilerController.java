@@ -95,7 +95,6 @@ public class CompilerController  implements Initializable {
         this.codeController.setFileEdited(true);
         this.screen.updateTitle(this.codeController.getFileName() + "*");
     }
-
     @FXML
     void onClickNewFile(ActionEvent event) {
         this.newFile();
@@ -198,7 +197,7 @@ public class CompilerController  implements Initializable {
     @FXML
     void onClickCompile(ActionEvent event) throws ParseException {
         this.consoleTextArea.setText("");
-        this.codeController.compile(this.codeTextArea, consoleTextArea);
+        this.codeController.compile(this.codeTextArea, consoleTextArea, screen);
     }
 
 
@@ -291,7 +290,7 @@ public class CompilerController  implements Initializable {
     @FXML
     void menuBarCompileOnClick(ActionEvent event) {
         this.consoleTextArea.setText("");
-        this.codeController.compile(this.codeTextArea, consoleTextArea);
+        this.codeController.compile(this.codeTextArea, consoleTextArea, screen);
     }
 
     @FXML

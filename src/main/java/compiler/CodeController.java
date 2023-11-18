@@ -143,10 +143,11 @@ public class CodeController {
         codeTextArea.setText("");
     }
 
-    void compile(TextArea code, TextArea consoleTextArea) {
+    void compile(TextArea code, TextArea consoleTextArea, CompilerApplication screen) {
         LangParser parser = null;
         try {
             parser = new LangParser(new ByteArrayInputStream(code.getText().getBytes()));
+            parser.eraseSemanticRules();
             parser.lexicalAnalyzer();
             consoleTextArea.setText(consoleTextArea.getText() + parser.getResult());
             if (parser.isValidLexical()) {
@@ -154,7 +155,16 @@ public class CodeController {
                 parser.setOutput(new ArrayList<ErrorStruct>());
                 parser.syntaxAnalyzer();
                 if (parser.isValidSyntax()) {
-                    consoleTextArea.appendText("The code was compiled successfully\n");
+                    if(parser.isValidSemantic()){
+                        consoleTextArea.appendText("The code was compiled successfully\n");
+                        screen.openTable(parser.getSemanticInstructions());
+                    } else {
+                        consoleTextArea.appendText("Found semantic errors:\n");
+
+                        for (String err : parser.getSemanticErrors()) {
+                            consoleTextArea.appendText(err + "\n");
+                        }
+                    }
                 } else {
                     consoleTextArea.appendText("Found " + parser.getOutput().size() + " syntactic errors:\n");
                     for (ErrorStruct err : parser.getOutput()) {
