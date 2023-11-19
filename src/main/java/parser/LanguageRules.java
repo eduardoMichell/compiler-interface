@@ -2,6 +2,7 @@ package parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class LanguageRules {
     private static final String WRITE_ALL_THIS = "write all this";
@@ -26,7 +27,9 @@ public class LanguageRules {
     private Token identifierRule3;
     private Token identifierRule10;
     private Token identifierRule24;
+    private Token identifierRule24Error;
     private Integer integerConstant12;
+    private List<Token> existingErrors;
     private List<String> error;
     private List<String> attributeList;
     boolean haveError;
@@ -49,9 +52,11 @@ public class LanguageRules {
         this.identifierRule3 = null;
         this.identifierRule10 = null;
         this.identifierRule24 = null;
+        this.identifierRule24Error = null;
         this.integerConstant12 = 0;
         this.haveError = false;
-        error = new ArrayList<>();
+        this.error = new ArrayList<>();
+        this.existingErrors = new ArrayList<>();
     }
 
     public boolean haveError() {
@@ -143,7 +148,7 @@ public class LanguageRules {
         }
     }
 
-    public void unstackLastInstructionAndUpdate(){
+    public void unstackLastInstructionAndUpdate() {
         String lastOfStack = unstack();
         for (Instruction instruction : instructionStack) {
             if (instruction.getPointer() == Integer.parseInt(lastOfStack)) {
@@ -168,9 +173,7 @@ public class LanguageRules {
     public void rule3(Token token) {
         String identifier = token.image;
         if (isSymbolPresent(identifier) || isPresentEnumSymbolTable(identifier)) {
-            error.add("Error: Identifier '" + identifier + "' already declared"
-                    + " - located at [line:" + token.beginLine + "| column: " + token.endColumn + "]");
-            haveError = true;
+            this.addError(token, "Identifier '" + identifier + "' already declared");
         } else {
             EnumIdentifier enumIdentifier = new EnumIdentifier(identifier, new ArrayList<>());
             this.identifierRule3 = token;
@@ -182,9 +185,7 @@ public class LanguageRules {
     public void rule4(Token token) {
         String identifier = token.image;
         if (isSymbolPresent(identifier) || isPresentEnumSymbolTable(identifier) || isPresentEnumIdentifierList(identifier)) {
-            error.add("Error: Identifier '" + identifier + "' already declared"
-                    + " - located at [line:" + token.beginLine + "| column: " + token.endColumn + "]");
-            haveError = true;
+            this.addError(token, "Identifier '" + identifier + "' already declared");
         } else {
             insertInstructionInEnumIdentifier(this.identifierRule3.image, identifier);
         }
@@ -269,9 +270,7 @@ public class LanguageRules {
     public void rule9(Token token) {
         String identifier = token.image;
         if (isSymbolPresent(identifier) || isPresentEnumSymbolTable(identifier) || isPresentEnumIdentifierList(identifier)) {
-            error.add("Error: Identifier '" + identifier + "' already declared"
-                    + " - located at [line:" + token.beginLine + "| column: " + token.endColumn + "]");
-            haveError = true;
+            this.addError(token, "Identifier '" + identifier + "' already declared");
         } else {
             VT += 1;
             VP += 1;
@@ -283,11 +282,8 @@ public class LanguageRules {
     public void rule10(Token token) {
         String identifier = token.image;
         if (context.equals(AS_VARIABLE)) {
-            if (isSymbolPresent(identifier) || isPresentEnumSymbolTable(identifier) ||  isPresentEnumIdentifierList(identifier)) {
-                System.out.println("'ta aqui bro'");
-                error.add("Error: Identifier '" + identifier + "' already declared"
-                        + " - located at [line:" + token.beginLine + "| column: " + token.endColumn + "]");
-                haveError = true;
+            if (isSymbolPresent(identifier) || isPresentEnumSymbolTable(identifier) || isPresentEnumIdentifierList(identifier)) {
+                this.addError(token, "Identifier '" + identifier + "' already declared");
             } else {
                 indexedVariable = false;
                 identifierRule10 = token;
@@ -301,91 +297,87 @@ public class LanguageRules {
     }
 
     public void rule11() {
-        Symbol objIdentifierRule10 = recoverSymbol(identifierRule10 != null ? identifierRule10.image : null);
-        if(!haveError){
-            switch (context) {
-                case AS_VARIABLE:
-                    if (!indexedVariable) {
+        Symbol objIdentifierRule10;
+        if (identifierRule10 != null) {
+            objIdentifierRule10 = recoverSymbol(identifierRule10.image);
+        } else {
+            objIdentifierRule10 = null;
+        }
+        switch (context) {
+            case AS_VARIABLE:
+                if (!indexedVariable) {
+                    if (identifierRule10 != null) {
                         VT += 1;
                         VP += 1;
                         symbolTable.add(new Symbol(identifierRule10.image, "?", VT.toString(), "-"));
-                    } else {
+                    }
+                } else {
+                    if (identifierRule10 != null) {
                         VI += 1;
                         TVI = TVI + integerConstant12;
                         symbolTable.add(new Symbol(identifierRule10.image, "?", String.valueOf(VT + 1), integerConstant12.toString()));
                         VT = VT + integerConstant12;
                     }
-                    break;
-                case ASSIGNMENT:
-                    if (isSymbolPresent(identifierRule10.image) &&
-                            (objIdentifierRule10.getCategory().equals("1")
-                                    || objIdentifierRule10.getCategory().equals("2")
-                                    || objIdentifierRule10.getCategory().equals("3")
-                                    || objIdentifierRule10.getCategory().equals("4"))) {
-                        if (objIdentifierRule10.getAttrTwo().equals("-")) {
-                            if (!indexedVariable) {
-                                attributeList.add(objIdentifierRule10.getAttrOne());
-                            } else {
-                                error.add("Error: '" + identifierRule10.image + "' is a non-indexed variable identifier"
-                                        + " - located at [line:" + identifierRule10.beginLine + "| column: " + identifierRule10.endColumn + "]");
-                                haveError = true;
-                            }
+                }
+                break;
+            case ASSIGNMENT:
+                if (isSymbolPresent(identifierRule10.image) &&
+                        (objIdentifierRule10.getCategory().equals("1")
+                                || objIdentifierRule10.getCategory().equals("2")
+                                || objIdentifierRule10.getCategory().equals("3")
+                                || objIdentifierRule10.getCategory().equals("4"))) {
+                    if (objIdentifierRule10.getAttrTwo().equals("-")) {
+                        if (!indexedVariable) {
+                            attributeList.add(objIdentifierRule10.getAttrOne());
                         } else {
-                            if (indexedVariable) {
-                                attributeList.add(Integer.toString(Integer.parseInt(objIdentifierRule10.getAttrOne()) + integerConstant12 - 1));
-                            } else {
-                                error.add("Error: Indexed variable identifier requires index"
-                                        + " - located at [line:" + identifierRule10.beginLine + "| column: " + identifierRule10.endColumn + "]");
-                                haveError = true;
-                            }
+                            this.addError(identifierRule10, identifierRule10.image + "' is a non-indexed variable identifier");
                         }
                     } else {
-                        error.add("Error: Undeclared identifier or program identifier, constant or enumerated type"
-                                + " - located at [line:" + identifierRule10.beginLine + "| column: " + identifierRule10.endColumn + "]");
-                        haveError = true;
-                    }
-                    break;
-                case INPUT:
-                    if (isSymbolPresent(identifierRule10.image) &&
-                            (objIdentifierRule10.getCategory().equals("1")
-                                    || objIdentifierRule10.getCategory().equals("2")
-                                    || objIdentifierRule10.getCategory().equals("3")
-                                    || objIdentifierRule10.getCategory().equals("4"))) {
-                        Symbol aux = recoverSymbol(objIdentifierRule10.getIdentifier());
-                        if (objIdentifierRule10.getAttrTwo().equals("-")) {
-                            if (!indexedVariable) {
-                                instructionStack.add(new Instruction(pointer, "REA", aux.getCategory()));
-                                pointer = pointer + 1;
-                                instructionStack.add(new Instruction(pointer, "STR", objIdentifierRule10.getAttrOne()));
-                                pointer = pointer + 1;
-                            } else {
-                                error.add("Error: '" + identifierRule10.image + "' is a non-indexed variable identifier"
-                                        + " - located at [line:" + identifierRule10.beginLine + "| column: " + identifierRule10.endColumn + "]");
-                                haveError = true;
-                            }
+                        if (indexedVariable) {
+                            attributeList.add(Integer.toString(Integer.parseInt(objIdentifierRule10.getAttrOne()) + integerConstant12 - 1));
                         } else {
-                            if (indexedVariable) {
-                                instructionStack.add(new Instruction(pointer, "REA", aux.getCategory()));
-                                pointer = pointer + 1;
-                                instructionStack.add(new Instruction(pointer, "STR",
-                                        Integer.toString(Integer.parseInt(objIdentifierRule10.getAttrOne()) + integerConstant12 - 1)));
-                                pointer = pointer + 1;
-                            } else {
-                                error.add("Error: Indexed variable identifier requires index"
-                                        + " - located at [line:" + identifierRule10.beginLine + "| column: " + identifierRule10.endColumn + "]");
-                                haveError = true;
-                            }
+                            this.addError(identifierRule10, "Indexed variable identifier requires index");
+                        }
+                    }
+                } else {
+                    this.addError(identifierRule10, "Error: Undeclared identifier or program identifier, constant or enumerated type");
+                }
+                break;
+            case INPUT:
+                if (isSymbolPresent(identifierRule10.image) &&
+                        (objIdentifierRule10.getCategory().equals("1")
+                                || objIdentifierRule10.getCategory().equals("2")
+                                || objIdentifierRule10.getCategory().equals("3")
+                                || objIdentifierRule10.getCategory().equals("4"))) {
+                    Symbol aux = recoverSymbol(objIdentifierRule10.getIdentifier());
+                    if (objIdentifierRule10.getAttrTwo().equals("-")) {
+                        if (!indexedVariable) {
+                            instructionStack.add(new Instruction(pointer, "REA", aux.getCategory()));
+                            pointer = pointer + 1;
+                            instructionStack.add(new Instruction(pointer, "STR", objIdentifierRule10.getAttrOne()));
+                            pointer = pointer + 1;
+                        } else {
+                            this.addError(identifierRule10, identifierRule10.image + "' is a non-indexed variable identifier");
                         }
                     } else {
-                        error.add("Error: Undeclared identifier or program identifier, constant or enumerated type"
-                                + " - located at [line:" + identifierRule10.beginLine + "| column: " + identifierRule10.endColumn + "]");
-                        haveError = true;
+                        if (indexedVariable) {
+                            instructionStack.add(new Instruction(pointer, "REA", aux.getCategory()));
+                            pointer = pointer + 1;
+                            instructionStack.add(new Instruction(pointer, "STR",
+                                    Integer.toString(Integer.parseInt(objIdentifierRule10.getAttrOne()) + integerConstant12 - 1)));
+                            pointer = pointer + 1;
+                        } else {
+                            this.addError(identifierRule10, "Indexed variable identifier requires index");
+                        }
                     }
-                    break;
-                default:
-                    break;
-            }
+                } else {
+                    this.addError(identifierRule10, "Undeclared identifier or program identifier, constant or enumerated type");
+                }
+                break;
+            default:
+                break;
         }
+
 
         printInstructions();
     }
@@ -485,49 +477,48 @@ public class LanguageRules {
             indexedVariable = false;
             identifierRule24 = token;
         } else {
-            error.add("Error: Undeclared identifier or program identifier or enumerated type"
-                    + " - located at [line:" + token.beginLine + "| column: " + token.endColumn + "]");
-            haveError = true;
+            this.identifierRule24Error = token;
+            this.addError(token, "Undeclared identifier or program identifier or enumerated type");
         }
         printInstructions();
     }
 
     public void rule25() {
-        Symbol objIdentifierRule24 = recoverSymbol(identifierRule24 != null ? identifierRule24.image : null);
-        if(!haveError){
-            if (!indexedVariable) {
-                if (objIdentifierRule24 != null && objIdentifierRule24.getAttrTwo().equals("-")) {
-                    if (output.equals(WRITE_ALL_THIS)) {
-                        instructionStack.add(new Instruction(pointer, "LDS", objIdentifierRule24.getIdentifier().concat("=")));
-                        pointer = pointer + 1;
-                        instructionStack.add(new Instruction(pointer, "WRT", "0"));
-                        pointer = pointer + 1;
-                    }
-                    instructionStack.add(new Instruction(pointer, "LDV", objIdentifierRule24.getAttrOne()));
+        Symbol objIdentifierRule24;
+        if (identifierRule24 != null) {
+            objIdentifierRule24 = recoverSymbol(identifierRule24.image);
+        } else {
+            objIdentifierRule24 = null;
+        }
+        if (!indexedVariable) {
+            if (objIdentifierRule24 != null && objIdentifierRule24.getAttrTwo().equals("-")) {
+                if (output.equals(WRITE_ALL_THIS)) {
+                    instructionStack.add(new Instruction(pointer, "LDS", objIdentifierRule24.getIdentifier().concat("=")));
                     pointer = pointer + 1;
-                } else {
-                    error.add("Error: Indexed variable identifier requires index"
-                            + " - located at [line:" + identifierRule24.beginLine + "| column: " + identifierRule24.endColumn + "]");
-                    haveError = true;
+                    instructionStack.add(new Instruction(pointer, "WRT", "0"));
+                    pointer = pointer + 1;
                 }
+                instructionStack.add(new Instruction(pointer, "LDV", objIdentifierRule24.getAttrOne()));
+                pointer = pointer + 1;
             } else {
-                if (objIdentifierRule24 != null && !objIdentifierRule24.getAttrTwo().equals("-")) {
-                    if (output.equals(WRITE_ALL_THIS)) {
-                        instructionStack.add(new Instruction(pointer, "LDS", objIdentifierRule24.getIdentifier().concat("=")));
-                        pointer = pointer + 1;
-                        instructionStack.add(new Instruction(pointer, "WRT", "0"));
-                        pointer = pointer + 1;
-                    }
-                    int auxValue = Integer.parseInt(objIdentifierRule24.getAttrOne()) + integerConstant12 - 1;
-                    instructionStack.add(new Instruction(pointer, "LDV", String.valueOf(auxValue)));
+                this.addError(identifierRule24Error, "Indexed variable identifier requires index");
+            }
+        } else {
+            if (objIdentifierRule24 != null && !objIdentifierRule24.getAttrTwo().equals("-")) {
+                if (output.equals(WRITE_ALL_THIS)) {
+                    instructionStack.add(new Instruction(pointer, "LDS", objIdentifierRule24.getIdentifier().concat("=")));
                     pointer = pointer + 1;
-                } else {
-                    error.add("Error: Constant or non-indexed variable identifier"
-                            + " - located at [line:" + identifierRule24.beginLine + "| column: " + identifierRule24.endColumn + "]");
-                    haveError = true;
+                    instructionStack.add(new Instruction(pointer, "WRT", "0"));
+                    pointer = pointer + 1;
                 }
+                int auxValue = Integer.parseInt(objIdentifierRule24.getAttrOne()) + integerConstant12 - 1;
+                instructionStack.add(new Instruction(pointer, "LDV", String.valueOf(auxValue)));
+                pointer = pointer + 1;
+            } else {
+                this.addError(identifierRule24Error, "Constant or non-indexed variable identifier");
             }
         }
+
         printInstructions();
     }
 
@@ -697,27 +688,23 @@ public class LanguageRules {
 
     public void rule51() {
         Symbol objIdentifierRule24 = recoverSymbol(identifierRule24 != null ? identifierRule24.image : null);
-        if(!haveError){
-        if (!indexedVariable) {
-            if (objIdentifierRule24 != null && objIdentifierRule24.getAttrTwo().equals("-")) {
-                instructionStack.add(new Instruction(pointer, "LDV", objIdentifierRule24.getAttrOne()));
-                pointer = pointer + 1;
+        if (!haveError) {
+            if (!indexedVariable) {
+                if (objIdentifierRule24 != null && objIdentifierRule24.getAttrTwo().equals("-")) {
+                    instructionStack.add(new Instruction(pointer, "LDV", objIdentifierRule24.getAttrOne()));
+                    pointer = pointer + 1;
+                } else {
+                    this.addError(identifierRule24, "Indexed variable identifier requires index");
+                }
             } else {
-                error.add("Error: Indexed variable identifier requires index"
-                        + " - located at [line:" + identifierRule24.beginLine + "| column: " + identifierRule24.endColumn + "]");
-                haveError = true;
+                if (objIdentifierRule24 != null && !objIdentifierRule24.getAttrTwo().equals("-")) {
+                    int auxValue = Integer.parseInt(objIdentifierRule24.getAttrOne()) + integerConstant12 - 1;
+                    instructionStack.add(new Instruction(pointer, "LDV", String.valueOf(auxValue)));
+                    pointer = pointer + 1;
+                } else {
+                    this.addError(identifierRule24, identifierRule24.image + "' is Identifier of constant or indexed variable");
+                }
             }
-        } else {
-            if (objIdentifierRule24 != null && !objIdentifierRule24.getAttrTwo().equals("-")) {
-                int auxValue = Integer.parseInt(objIdentifierRule24.getAttrOne()) + integerConstant12 - 1;
-                instructionStack.add(new Instruction(pointer, "LDV", String.valueOf(auxValue)));
-                pointer = pointer + 1;
-            } else {
-                error.add("Error: '" + identifierRule24.image + "' is Identifier of constant or indexed variable"
-                        + " - located at [line:" + identifierRule24.beginLine + "| column: " + identifierRule24.endColumn + "]");
-                haveError = true;
-            }
-        }
         }
         printInstructions();
     }
@@ -740,25 +727,46 @@ public class LanguageRules {
         printInstructions();
     }
 
+    public void addError(Token token, String message) {
+        boolean errorExists = false;
+        for (Token errorToken : existingErrors) {
+            if (Objects.equals(errorToken.image, token.image) &&
+                    errorToken.beginLine == token.beginLine &&
+                    errorToken.beginColumn == token.beginColumn) {
+                errorExists = true;
+                break;
+            }
+        }
+        if (!errorExists) {
+            this.error.add("Error: " + message + " - located at [line:" + token.beginLine + "| column: " + token.endColumn + "]");
+            this.existingErrors.add(token);
+        }
+        haveError = true;
+    }
+
+
     public void printInstructions() {
+        System.out.println("Pointer: "  + pointer);
         System.out.println("context: " + context);
         System.out.println("vp:" + VP);
         System.out.println("vI:" + VI);
         System.out.println("vt:" + VT);
         System.out.println("type:" + type);
+        System.out.println("Instruction Stack: ");
         for (Instruction inst : instructionStack) {
             System.out.println(inst.getPointer() + ", " + inst.getCode() + ", " + inst.getAddress());
         }
+        System.out.println("Symbol Table: ");
         for (Symbol symbol : symbolTable) {
             System.out.println(symbol.getIdentifier() + ", " + symbol.getCategory() + ", " + symbol.getAttrOne() + ", " + symbol.getAttrTwo());
         }
         if (haveError) {
-            System.out.println("ERRORERRORERRORERRORERROR");
-
+            System.out.println("Errors: ");
             for (String error : error) {
                 System.out.println(error + "\n");
             }
         }
+        System.out.println("\n");
     }
 
 }
