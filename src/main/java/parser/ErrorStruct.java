@@ -170,6 +170,8 @@ public class ErrorStruct {
              return "Capital Letter";
             case "<LETTER>":
                 return "Letter";
+            case "<EOF>":
+                return "End of File";
             default:
                 return token;
         }

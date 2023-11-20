@@ -149,7 +149,6 @@ public class CodeController {
             parser = new LangParser(new ByteArrayInputStream(code.getText().getBytes()));
             parser.eraseSemanticRules();
             parser.lexicalAnalyzer();
-            consoleTextArea.setText(consoleTextArea.getText() + parser.getResult());
             if (parser.isValidLexical()) {
                 parser = new LangParser(new ByteArrayInputStream(code.getText().getBytes()));
                 parser.setOutput(new ArrayList<ErrorStruct>());
@@ -172,7 +171,9 @@ public class CodeController {
                     }
                 }
             } else {
-                consoleTextArea.appendText("The lexical analyzer encountered a problem and was unable to continue parsing\n");
+                consoleTextArea.appendText("Found lexical errors:\n");
+                consoleTextArea.setText(consoleTextArea.getText() + parser.getResult());
+
             }
         } catch (ParseException e) {
             consoleTextArea.setText(consoleTextArea.getText() + parser.getResult() + e.getMessage());
