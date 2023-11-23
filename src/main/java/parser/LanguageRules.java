@@ -330,7 +330,7 @@ public class LanguageRules {
                         if (!indexedVariable) {
                             attributeList.add(objIdentifierRule10.getAttrOne());
                         } else {
-                            this.addError(identifierRule10, identifierRule10.image + "' is a non-indexed variable identifier");
+                            this.addError(identifierRule10, "'" + identifierRule10.image + "' is a non-indexed variable identifier");
                         }
                     } else {
                         if (indexedVariable) {
@@ -340,7 +340,7 @@ public class LanguageRules {
                         }
                     }
                 } else {
-                    this.addError(identifierRule10, "Error: Undeclared identifier or program identifier, constant or enumerated type");
+                    this.addError(identifierRule10, "Undeclared identifier or program identifier, constant or enumerated type");
                 }
                 break;
             case INPUT:
@@ -545,10 +545,12 @@ public class LanguageRules {
 
     public void rule29() {
         String lastOfStack = unstack();
-        for (Instruction instruction : instructionStack) {
-            if (instruction.getPointer() == Integer.parseInt(lastOfStack)) {
-                instruction.setAddress(pointer.toString());
-                break;
+        if(lastOfStack != null) {
+            for (Instruction instruction : instructionStack) {
+                if (instruction.getPointer() == Integer.parseInt(lastOfStack)) {
+                    instruction.setAddress(pointer.toString());
+                    break;
+                }
             }
         }
         printInstructions();
@@ -702,7 +704,7 @@ public class LanguageRules {
                     instructionStack.add(new Instruction(pointer, "LDV", String.valueOf(auxValue)));
                     pointer = pointer + 1;
                 } else {
-                    this.addError(identifierRule24, identifierRule24.image + "' is Identifier of constant or indexed variable");
+                    this.addError(identifierRule24, "'" + identifierRule24.image + "' is Identifier of constant or indexed variable");
                 }
             }
         }
