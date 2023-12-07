@@ -453,7 +453,7 @@ TOKEN : {
 
 void declarations(RecoverySet r) : {} {
     try {
-        (<DECLARATION> declarationOne(r))*
+        (<DECLARATION> declarationOne(r))?
     } catch (ParseException e) {
         output.add(new ErrorStruct("Invalid enum/variable declaration", e));
         consumeUntil(r, e);
@@ -473,7 +473,7 @@ void declarationOne(RecoverySet r) : {} {
 
 void declarationTwo(RecoverySet r) : {} {
     try {
-       (<DECLARATION> declarationConstantsAndVariables(r))
+       (<DECLARATION> declarationConstantsAndVariables(r))?
     } catch (ParseException e) {
         output.add(new ErrorStruct("Invalid variable declaration", e));
         consumeUntil(r, e);
@@ -524,7 +524,7 @@ void item() : { Token t; } {
 
 void identifierVariableList() : { Token t; } {
     try {
-        <IDENTIFIER> addRule("#10", t) index() addRule("#11", null) (identifierVariableOne())*
+        <IDENTIFIER> addRule("#10", t) index() addRule("#11", null) identifierVariableOne()
     } catch (ParseException e){
         output.add(new ErrorStruct("Incorrect identifier variable", e));
         validSyntax = false;
@@ -533,7 +533,7 @@ void identifierVariableList() : { Token t; } {
 
 void identifierVariableOne() : {} {
     try {
-        <SEMI_COLUMN> identifierVariableList()
+        (<SEMI_COLUMN> identifierVariableList())*
     } catch (ParseException e){
         output.add(new ErrorStruct("Incorrect identifier variable", e));
         validSyntax = false;
@@ -542,7 +542,7 @@ void identifierVariableOne() : {} {
 
 void identifierConstantList() : { Token t; } {
     try {
-        <IDENTIFIER> addRule("#9", t) (identifierConstantOne())*
+        <IDENTIFIER> addRule("#9", t) identifierConstantOne()
     } catch (ParseException e){
         output.add(new ErrorStruct("Incorrect identifier list", e));
         validSyntax = false;
@@ -551,7 +551,7 @@ void identifierConstantList() : { Token t; } {
 
 void identifierConstantOne() : {} {
     try {
-        <SEMI_COLUMN> identifierConstantList()
+       (<SEMI_COLUMN> identifierConstantList())*
     } catch (ParseException e){
         output.add(new ErrorStruct("Incorrect identifier list", e));
         validSyntax = false;
@@ -563,24 +563,24 @@ void typeDeclaration() : {} {
 }
 
 void variableDeclaration() : {} {
-   identifierVariableList() <IS> typeDeclaration() addRule("#6", null) <DOT> (variableDeclarationOne())*
+   identifierVariableList() <IS> typeDeclaration() addRule("#6", null) <DOT> variableDeclarationOne()
 }
 
 void variableDeclarationOne() : {} {
-   variableDeclaration()
+   (variableDeclaration())*
 }
 
 void constantDeclaration() : { Token t; } {
    identifierConstantList() <IS>  typeDeclaration() addRule("#6", null) <ATTRIBUTION>
-   (<LITERAL_CONSTANT> | <INTEGER_NUMERICAL_CONSTANT> | <REAL_NUMERICAL_CONSTANT>) addRule("#7", t) <DOT> (constantDeclarationOne())*
+   (<LITERAL_CONSTANT> | <INTEGER_NUMERICAL_CONSTANT> | <REAL_NUMERICAL_CONSTANT>) addRule("#7", t) <DOT> constantDeclarationOne()
 }
 
 void constantDeclarationOne() : { Token t; } {
-   constantDeclaration()
+   (constantDeclaration())*
 }
 
 void endConstant() : {} {
-    <AS> startConstant()
+    (<AS> startConstant())?
 }
 
 void startVariable() : {} {
@@ -588,16 +588,16 @@ void startVariable() : {} {
 }
 
 void startConstant() : {} {
-    <CONSTANT> addRule("#5", null) (constantDeclaration())+
+    <CONSTANT> addRule("#5", null) constantDeclaration()
 }
 
 void endVariable() : {} {
-    <AS> startVariable()
+    (<AS> startVariable())?
 }
 
 void startDeclaration(RecoverySet r) : {} {
     try {
-        startVariable() (endConstant())? | startConstant() (endVariable())?
+       (startConstant() endVariable()) | (startVariable() endConstant())
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid body declaration", e));
         consumeUntil(r, e);
@@ -626,10 +626,10 @@ void declarationConstantsAndVariables(RecoverySet r) : {} {
 }
 
 void identifierConstantAndVariableList(): {} {
-    item() addRule("#23", null) (identifierConstantAndVariable())*
+    item() addRule("#23", null) (identifierConstantAndVariableListOne())*
 }
 
-void identifierConstantAndVariable(): {} {
+void identifierConstantAndVariableListOne(): {} {
     <SEMI_COLUMN> identifierConstantAndVariableList()
 }
 
@@ -716,7 +716,7 @@ void repeat(RecoverySet r) : {
     }
 }
 
-void logicResult(RecoverySet r) : { RecoverySet g = new RecoverySet(CLOSE_BOX); } {
+void avaliateOne(RecoverySet r) : { RecoverySet g = new RecoverySet(CLOSE_BOX); } {
     try {
           <TRUE> <RESULT> addRule("#30", null) <OPEN_BOX> commandList(g) <CLOSE_BOX> continuationTrueResult() <DOT>
         | <UNTRUE> <RESULT> addRule("#31", null) <OPEN_BOX> commandList(g) <CLOSE_BOX> continuationUntrueResult()  <DOT>
@@ -729,7 +729,7 @@ void logicResult(RecoverySet r) : { RecoverySet g = new RecoverySet(CLOSE_BOX); 
 
 void continuationTrueResult() : { RecoverySet g = new RecoverySet(CLOSE_BOX); } {
     try {
-        (<UNTRUE> <RESULT> addRule("#32", null) <OPEN_BOX> commandList(g) <CLOSE_BOX>)
+        (<UNTRUE> <RESULT> addRule("#32", null) <OPEN_BOX> commandList(g) <CLOSE_BOX>)?
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid avaliate bory logic result declaration", e));
         consumeUntil(g, e);
@@ -739,7 +739,7 @@ void continuationTrueResult() : { RecoverySet g = new RecoverySet(CLOSE_BOX); } 
 
 void continuationUntrueResult() : { RecoverySet g = new RecoverySet(CLOSE_BOX); } {
     try {
-        (<TRUE> <RESULT> addRule("#32", null) <OPEN_BOX> commandList(g) <CLOSE_BOX>)
+        (<TRUE> <RESULT> addRule("#32", null) <OPEN_BOX> commandList(g) <CLOSE_BOX>)?
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid avaliate bory logic result declaration", e));
         consumeUntil(g, e);
@@ -749,8 +749,7 @@ void continuationUntrueResult() : { RecoverySet g = new RecoverySet(CLOSE_BOX); 
 
 void avaliate(RecoverySet r) : { RecoverySet g = new RecoverySet(DOT); } {
     try {
-        <AVALIATE> <THIS> expression(First.avaliate)
-            logicResult(g) addRule("#29", null)
+        <AVALIATE> <THIS> expression(First.avaliate) avaliateOne(g) addRule("#29", null)
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid avaliate command declaration", e));
         consumeUntil(r, e);
@@ -760,7 +759,7 @@ void avaliate(RecoverySet r) : { RecoverySet g = new RecoverySet(DOT); } {
 
 void write(RecoverySet g) : {} {
     try {
-        <THIS> addRule("#22", null) <OPEN_BOX> identifierConstantAndVariableList() <CLOSE_BOX> <DOT>
+        <WRITE> writeOne(g)
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid write command declaration", e));
         consumeUntil(g, e);
@@ -768,11 +767,12 @@ void write(RecoverySet g) : {} {
    }
 }
 
-void writeAll(RecoverySet g) : {} {
-   try {
-        <ALL> <THIS> addRule("#21", null) <OPEN_BOX> identifierConstantAndVariableList() <CLOSE_BOX> <DOT>
-   } catch (ParseException e){
-        output.add(new ErrorStruct("Invalid write all command declaration", e));
+void writeOne(RecoverySet g) : {} {
+    try {
+        <ALL> <THIS> addRule("#21", null) <OPEN_BOX> identifierConstantAndVariableList() <CLOSE_BOX> <DOT> |
+         <THIS> addRule("#22", null) <OPEN_BOX> identifierConstantAndVariableList() <CLOSE_BOX> <DOT>
+    } catch (ParseException e){
+        output.add(new ErrorStruct("Invalid write command declaration", e));
         consumeUntil(g, e);
         validSyntax = false;
    }
@@ -800,7 +800,7 @@ void read(RecoverySet r) : {} {
 
 void commandList(RecoverySet r) : { RecoverySet g = First.commandList; } {
     try {
-        (repeat(g) | avaliate(g) | (<WRITE> (write(g) | writeAll(g))) | designate(g) | read(g))+
+        (repeat(g) | avaliate(g) | write(g) | designate(g) | read(g))+
     } catch (ParseException e){
         output.add(new ErrorStruct("Invalid command list declaration", e));
         consumeUntil(r, e);

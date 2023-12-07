@@ -286,19 +286,15 @@ public class LangParser implements LangParserConstants {
     trace_call("declarations");
     try {
       try {
-        label_1:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case DECLARATION:{
-            ;
-            break;
-            }
-          default:
-            jj_la1[0] = jj_gen;
-            break label_1;
-          }
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case DECLARATION:{
           jj_consume_token(DECLARATION);
           declarationOne(r);
+          break;
+          }
+        default:
+          jj_la1[0] = jj_gen;
+          ;
         }
       } catch (ParseException e) {
 output.add(new ErrorStruct("Invalid enum/variable declaration", e));
@@ -346,8 +342,16 @@ output.add(new ErrorStruct("Invalid enum/variable declaration", e));
     trace_call("declarationTwo");
     try {
       try {
-        jj_consume_token(DECLARATION);
-        declarationConstantsAndVariables(r);
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case DECLARATION:{
+          jj_consume_token(DECLARATION);
+          declarationConstantsAndVariables(r);
+          break;
+          }
+        default:
+          jj_la1[2] = jj_gen;
+          ;
+        }
       } catch (ParseException e) {
 output.add(new ErrorStruct("Invalid variable declaration", e));
         consumeUntil(r, e);
@@ -362,7 +366,7 @@ output.add(new ErrorStruct("Invalid variable declaration", e));
     trace_call("enumDeclaration");
     try {Token t;
       try {
-          t = jj_consume_token(IDENTIFIER);
+          t=jj_consume_token(IDENTIFIER);
         addRule("#3", t);
         jj_consume_token(IS);
         jj_consume_token(OPEN_KEYS);
@@ -384,7 +388,7 @@ output.add(new ErrorStruct("Invalid enum declaration", e));
     trace_call("enumDeclarationOne");
     try {
       try {
-        label_2:
+        label_1:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case IDENTIFIER:{
@@ -392,8 +396,8 @@ output.add(new ErrorStruct("Invalid enum declaration", e));
             break;
             }
           default:
-            jj_la1[2] = jj_gen;
-            break label_2;
+            jj_la1[3] = jj_gen;
+            break label_1;
           }
           enumDeclaration(r);
         }
@@ -410,7 +414,7 @@ output.add(new ErrorStruct("Invalid enum declaration", e));
   final public void innerEnumDeclaration() throws ParseException {
     trace_call("innerEnumDeclaration");
     try {Token t;
-        t = jj_consume_token(IDENTIFIER);
+        t=jj_consume_token(IDENTIFIER);
       addRule("#4", t);
       innerEnumDeclarationOne();
     } finally {
@@ -421,7 +425,7 @@ output.add(new ErrorStruct("Invalid enum declaration", e));
   final public void innerEnumDeclarationOne() throws ParseException {
     trace_call("innerEnumDeclarationOne");
     try {
-      label_3:
+      label_2:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case SEMI_COLUMN:{
@@ -429,8 +433,8 @@ output.add(new ErrorStruct("Invalid enum declaration", e));
           break;
           }
         default:
-          jj_la1[3] = jj_gen;
-          break label_3;
+          jj_la1[4] = jj_gen;
+          break label_2;
         }
         jj_consume_token(SEMI_COLUMN);
         innerEnumDeclaration();
@@ -446,13 +450,13 @@ output.add(new ErrorStruct("Invalid enum declaration", e));
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case OPEN_KEYS:{
         jj_consume_token(OPEN_KEYS);
-          t = jj_consume_token(INTEGER_NUMERICAL_CONSTANT);
+          t=jj_consume_token(INTEGER_NUMERICAL_CONSTANT);
         addRule("#12", t);
         jj_consume_token(CLOSE_KEYS);
         break;
         }
       default:
-        jj_la1[4] = jj_gen;
+        jj_la1[5] = jj_gen;
         ;
       }
     } finally {
@@ -465,29 +469,29 @@ output.add(new ErrorStruct("Invalid enum declaration", e));
     try {Token t;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case IDENTIFIER:{
-          t = jj_consume_token(IDENTIFIER);
+          t= jj_consume_token(IDENTIFIER);
         addRule("#24", t);
         index();
         addRule("#25", null);
         break;
         }
       case INTEGER_NUMERICAL_CONSTANT:{
-          t =jj_consume_token(INTEGER_NUMERICAL_CONSTANT);
+          t=  jj_consume_token(INTEGER_NUMERICAL_CONSTANT);
         addRule("#26", t);
         break;
         }
       case REAL_NUMERICAL_CONSTANT:{
-          t =jj_consume_token(REAL_NUMERICAL_CONSTANT);
+          t= jj_consume_token(REAL_NUMERICAL_CONSTANT);
         addRule("#27", t);
         break;
         }
       case LITERAL_CONSTANT:{
-          t =jj_consume_token(LITERAL_CONSTANT);
+          t=  jj_consume_token(LITERAL_CONSTANT);
         addRule("#28", t);
         break;
         }
       default:
-        jj_la1[5] = jj_gen;
+        jj_la1[6] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -500,23 +504,11 @@ output.add(new ErrorStruct("Invalid enum declaration", e));
     trace_call("identifierVariableList");
     try {Token t;
       try {
-          t = jj_consume_token(IDENTIFIER);
+          t=jj_consume_token(IDENTIFIER);
         addRule("#10", t);
         index();
         addRule("#11", null);
-        label_4:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case SEMI_COLUMN:{
-            ;
-            break;
-            }
-          default:
-            jj_la1[6] = jj_gen;
-            break label_4;
-          }
-          identifierVariableOne();
-        }
+        identifierVariableOne();
       } catch (ParseException e) {
 output.add(new ErrorStruct("Incorrect identifier variable", e));
         validSyntax = false;
@@ -530,8 +522,20 @@ output.add(new ErrorStruct("Incorrect identifier variable", e));
     trace_call("identifierVariableOne");
     try {
       try {
-        jj_consume_token(SEMI_COLUMN);
-        identifierVariableList();
+        label_3:
+        while (true) {
+          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+          case SEMI_COLUMN:{
+            ;
+            break;
+            }
+          default:
+            jj_la1[7] = jj_gen;
+            break label_3;
+          }
+          jj_consume_token(SEMI_COLUMN);
+          identifierVariableList();
+        }
       } catch (ParseException e) {
 output.add(new ErrorStruct("Incorrect identifier variable", e));
         validSyntax = false;
@@ -545,21 +549,9 @@ output.add(new ErrorStruct("Incorrect identifier variable", e));
     trace_call("identifierConstantList");
     try {Token t;
       try {
-          t = jj_consume_token(IDENTIFIER);
+          t=jj_consume_token(IDENTIFIER);
         addRule("#9", t);
-        label_5:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case SEMI_COLUMN:{
-            ;
-            break;
-            }
-          default:
-            jj_la1[7] = jj_gen;
-            break label_5;
-          }
-          identifierConstantOne();
-        }
+        identifierConstantOne();
       } catch (ParseException e) {
 output.add(new ErrorStruct("Incorrect identifier list", e));
         validSyntax = false;
@@ -573,8 +565,20 @@ output.add(new ErrorStruct("Incorrect identifier list", e));
     trace_call("identifierConstantOne");
     try {
       try {
-        jj_consume_token(SEMI_COLUMN);
-        identifierConstantList();
+        label_4:
+        while (true) {
+          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+          case SEMI_COLUMN:{
+            ;
+            break;
+            }
+          default:
+            jj_la1[8] = jj_gen;
+            break label_4;
+          }
+          jj_consume_token(SEMI_COLUMN);
+          identifierConstantList();
+        }
       } catch (ParseException e) {
 output.add(new ErrorStruct("Incorrect identifier list", e));
         validSyntax = false;
@@ -614,7 +618,7 @@ output.add(new ErrorStruct("Incorrect identifier list", e));
         break;
         }
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[9] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -631,19 +635,7 @@ output.add(new ErrorStruct("Incorrect identifier list", e));
       typeDeclaration();
       addRule("#6", null);
       jj_consume_token(DOT);
-      label_6:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case IDENTIFIER:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[9] = jj_gen;
-          break label_6;
-        }
-        variableDeclarationOne();
-      }
+      variableDeclarationOne();
     } finally {
       trace_return("variableDeclaration");
     }
@@ -652,7 +644,19 @@ output.add(new ErrorStruct("Incorrect identifier list", e));
   final public void variableDeclarationOne() throws ParseException {
     trace_call("variableDeclarationOne");
     try {
-      variableDeclaration();
+      label_5:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case IDENTIFIER:{
+          ;
+          break;
+          }
+        default:
+          jj_la1[10] = jj_gen;
+          break label_5;
+        }
+        variableDeclaration();
+      }
     } finally {
       trace_return("variableDeclarationOne");
     }
@@ -668,37 +672,25 @@ output.add(new ErrorStruct("Incorrect identifier list", e));
       jj_consume_token(ATTRIBUTION);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LITERAL_CONSTANT:{
-          t =jj_consume_token(LITERAL_CONSTANT);
+          t=jj_consume_token(LITERAL_CONSTANT);
         break;
         }
       case INTEGER_NUMERICAL_CONSTANT:{
-          t =jj_consume_token(INTEGER_NUMERICAL_CONSTANT);
+          t= jj_consume_token(INTEGER_NUMERICAL_CONSTANT);
         break;
         }
       case REAL_NUMERICAL_CONSTANT:{
-          t =jj_consume_token(REAL_NUMERICAL_CONSTANT);
+          t= jj_consume_token(REAL_NUMERICAL_CONSTANT);
         break;
         }
       default:
-        jj_la1[10] = jj_gen;
+        jj_la1[11] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       addRule("#7", t);
       jj_consume_token(DOT);
-      label_7:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case IDENTIFIER:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[11] = jj_gen;
-          break label_7;
-        }
-        constantDeclarationOne();
-      }
+      constantDeclarationOne();
     } finally {
       trace_return("constantDeclaration");
     }
@@ -707,7 +699,19 @@ output.add(new ErrorStruct("Incorrect identifier list", e));
   final public void constantDeclarationOne() throws ParseException {
     trace_call("constantDeclarationOne");
     try {Token t;
-      constantDeclaration();
+      label_6:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case IDENTIFIER:{
+          ;
+          break;
+          }
+        default:
+          jj_la1[12] = jj_gen;
+          break label_6;
+        }
+        constantDeclaration();
+      }
     } finally {
       trace_return("constantDeclarationOne");
     }
@@ -716,8 +720,16 @@ output.add(new ErrorStruct("Incorrect identifier list", e));
   final public void endConstant() throws ParseException {
     trace_call("endConstant");
     try {
-      jj_consume_token(AS);
-      startConstant();
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case AS:{
+        jj_consume_token(AS);
+        startConstant();
+        break;
+        }
+      default:
+        jj_la1[13] = jj_gen;
+        ;
+      }
     } finally {
       trace_return("endConstant");
     }
@@ -739,19 +751,7 @@ output.add(new ErrorStruct("Incorrect identifier list", e));
     try {
       jj_consume_token(CONSTANT);
       addRule("#5", null);
-      label_8:
-      while (true) {
-        constantDeclaration();
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case IDENTIFIER:{
-          ;
-          break;
-          }
-        default:
-          jj_la1[12] = jj_gen;
-          break label_8;
-        }
-      }
+      constantDeclaration();
     } finally {
       trace_return("startConstant");
     }
@@ -760,8 +760,16 @@ output.add(new ErrorStruct("Incorrect identifier list", e));
   final public void endVariable() throws ParseException {
     trace_call("endVariable");
     try {
-      jj_consume_token(AS);
-      startVariable();
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case AS:{
+        jj_consume_token(AS);
+        startVariable();
+        break;
+        }
+      default:
+        jj_la1[14] = jj_gen;
+        ;
+      }
     } finally {
       trace_return("endVariable");
     }
@@ -772,30 +780,14 @@ output.add(new ErrorStruct("Incorrect identifier list", e));
     try {
       try {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case VARIABLE:{
-          startVariable();
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case AS:{
-            endConstant();
-            break;
-            }
-          default:
-            jj_la1[13] = jj_gen;
-            ;
-          }
-          break;
-          }
         case CONSTANT:{
           startConstant();
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case AS:{
-            endVariable();
-            break;
-            }
-          default:
-            jj_la1[14] = jj_gen;
-            ;
+          endVariable();
+          break;
           }
+        case VARIABLE:{
+          startVariable();
+          endConstant();
           break;
           }
         default:
@@ -854,7 +846,7 @@ output.add(new ErrorStruct("Invalid constant and variable declaration", e));
     try {
       item();
       addRule("#23", null);
-      label_9:
+      label_7:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case SEMI_COLUMN:{
@@ -863,22 +855,22 @@ output.add(new ErrorStruct("Invalid constant and variable declaration", e));
           }
         default:
           jj_la1[16] = jj_gen;
-          break label_9;
+          break label_7;
         }
-        identifierConstantAndVariable();
+        identifierConstantAndVariableListOne();
       }
     } finally {
       trace_return("identifierConstantAndVariableList");
     }
   }
 
-  final public void identifierConstantAndVariable() throws ParseException {
-    trace_call("identifierConstantAndVariable");
+  final public void identifierConstantAndVariableListOne() throws ParseException {
+    trace_call("identifierConstantAndVariableListOne");
     try {
       jj_consume_token(SEMI_COLUMN);
       identifierConstantAndVariableList();
     } finally {
-      trace_return("identifierConstantAndVariable");
+      trace_return("identifierConstantAndVariableListOne");
     }
   }
 
@@ -933,7 +925,7 @@ output.add(new ErrorStruct("Invalid constant and variable declaration", e));
       try {
         jj_consume_token(DO);
         jj_consume_token(THIS);
-          t = jj_consume_token(IDENTIFIER);
+          t= jj_consume_token(IDENTIFIER);
         addRule("#1", t);
         jj_consume_token(OPEN_BOX);
         jj_consume_token(CLOSE_BOX);
@@ -1061,24 +1053,24 @@ output.add(new ErrorStruct("Invalid expression declaration", e));
     try {Token t;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case IDENTIFIER:{
-       t = jj_consume_token(IDENTIFIER);
+        t=jj_consume_token(IDENTIFIER);
         addRule("#24", t);
         index();
         addRule("#51", null);
         break;
         }
       case INTEGER_NUMERICAL_CONSTANT:{
-          t = jj_consume_token(INTEGER_NUMERICAL_CONSTANT);
+          t=jj_consume_token(INTEGER_NUMERICAL_CONSTANT);
         addRule("#26", t);
         break;
         }
       case REAL_NUMERICAL_CONSTANT:{
-          t =  jj_consume_token(REAL_NUMERICAL_CONSTANT);
+          t=jj_consume_token(REAL_NUMERICAL_CONSTANT);
         addRule("#27", t);
         break;
         }
       case LITERAL_CONSTANT:{
-          t = jj_consume_token(LITERAL_CONSTANT);
+          t=jj_consume_token(LITERAL_CONSTANT);
         addRule("#28", t);
         break;
         }
@@ -1119,7 +1111,7 @@ output.add(new ErrorStruct("Invalid expression declaration", e));
   final public void topPriorityOperators(RecoverySet g) throws ParseException {
     trace_call("topPriorityOperators");
     try {
-      label_10:
+      label_8:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case POTENCE:{
@@ -1128,7 +1120,7 @@ output.add(new ErrorStruct("Invalid expression declaration", e));
           }
         default:
           jj_la1[22] = jj_gen;
-          break label_10;
+          break label_8;
         }
         jj_consume_token(POTENCE);
         element(g);
@@ -1142,7 +1134,7 @@ output.add(new ErrorStruct("Invalid expression declaration", e));
   final public void mediumPriorityOperators(RecoverySet g) throws ParseException {
     trace_call("mediumPriorityOperators");
     try {
-      label_11:
+      label_9:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case AND_LOGIC:
@@ -1155,7 +1147,7 @@ output.add(new ErrorStruct("Invalid expression declaration", e));
           }
         default:
           jj_la1[23] = jj_gen;
-          break label_11;
+          break label_9;
         }
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case MULTIPLY:{
@@ -1202,7 +1194,7 @@ output.add(new ErrorStruct("Invalid expression declaration", e));
   final public void lesserPriorityOperators(RecoverySet g) throws ParseException {
     trace_call("lesserPriorityOperators");
     try {
-      label_12:
+      label_10:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case OR_LOGIC:
@@ -1213,7 +1205,7 @@ output.add(new ErrorStruct("Invalid expression declaration", e));
           }
         default:
           jj_la1[25] = jj_gen;
-          break label_12;
+          break label_10;
         }
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case PLUS:{
@@ -1270,8 +1262,8 @@ output.add(new ErrorStruct("Invalid repeat command declaration", e));
     }
   }
 
-  final public void logicResult(RecoverySet r) throws ParseException {
-    trace_call("logicResult");
+  final public void avaliateOne(RecoverySet r) throws ParseException {
+    trace_call("avaliateOne");
     try {RecoverySet g = new RecoverySet(CLOSE_BOX);
       try {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -1308,7 +1300,7 @@ output.add(new ErrorStruct("Invalid avaliate bory logic result declaration", e))
         validSyntax = false;
       }
     } finally {
-      trace_return("logicResult");
+      trace_return("avaliateOne");
     }
   }
 
@@ -1316,12 +1308,20 @@ output.add(new ErrorStruct("Invalid avaliate bory logic result declaration", e))
     trace_call("continuationTrueResult");
     try {RecoverySet g = new RecoverySet(CLOSE_BOX);
       try {
-        jj_consume_token(UNTRUE);
-        jj_consume_token(RESULT);
-        addRule("#32", null);
-        jj_consume_token(OPEN_BOX);
-        commandList(g);
-        jj_consume_token(CLOSE_BOX);
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case UNTRUE:{
+          jj_consume_token(UNTRUE);
+          jj_consume_token(RESULT);
+          addRule("#32", null);
+          jj_consume_token(OPEN_BOX);
+          commandList(g);
+          jj_consume_token(CLOSE_BOX);
+          break;
+          }
+        default:
+          jj_la1[28] = jj_gen;
+          ;
+        }
       } catch (ParseException e) {
 output.add(new ErrorStruct("Invalid avaliate bory logic result declaration", e));
         consumeUntil(g, e);
@@ -1336,12 +1336,20 @@ output.add(new ErrorStruct("Invalid avaliate bory logic result declaration", e))
     trace_call("continuationUntrueResult");
     try {RecoverySet g = new RecoverySet(CLOSE_BOX);
       try {
-        jj_consume_token(TRUE);
-        jj_consume_token(RESULT);
-        addRule("#32", null);
-        jj_consume_token(OPEN_BOX);
-        commandList(g);
-        jj_consume_token(CLOSE_BOX);
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case TRUE:{
+          jj_consume_token(TRUE);
+          jj_consume_token(RESULT);
+          addRule("#32", null);
+          jj_consume_token(OPEN_BOX);
+          commandList(g);
+          jj_consume_token(CLOSE_BOX);
+          break;
+          }
+        default:
+          jj_la1[29] = jj_gen;
+          ;
+        }
       } catch (ParseException e) {
 output.add(new ErrorStruct("Invalid avaliate bory logic result declaration", e));
         consumeUntil(g, e);
@@ -1359,7 +1367,7 @@ output.add(new ErrorStruct("Invalid avaliate bory logic result declaration", e))
         jj_consume_token(AVALIATE);
         jj_consume_token(THIS);
         expression(First.avaliate);
-        logicResult(g);
+        avaliateOne(g);
         addRule("#29", null);
       } catch (ParseException e) {
 output.add(new ErrorStruct("Invalid avaliate command declaration", e));
@@ -1375,12 +1383,8 @@ output.add(new ErrorStruct("Invalid avaliate command declaration", e));
     trace_call("write");
     try {
       try {
-        jj_consume_token(THIS);
-        addRule("#22", null);
-        jj_consume_token(OPEN_BOX);
-        identifierConstantAndVariableList();
-        jj_consume_token(CLOSE_BOX);
-        jj_consume_token(DOT);
+        jj_consume_token(WRITE);
+        writeOne(g);
       } catch (ParseException e) {
 output.add(new ErrorStruct("Invalid write command declaration", e));
         consumeUntil(g, e);
@@ -1391,24 +1395,42 @@ output.add(new ErrorStruct("Invalid write command declaration", e));
     }
   }
 
-  final public void writeAll(RecoverySet g) throws ParseException {
-    trace_call("writeAll");
+  final public void writeOne(RecoverySet g) throws ParseException {
+    trace_call("writeOne");
     try {
       try {
-        jj_consume_token(ALL);
-        jj_consume_token(THIS);
-        addRule("#21", null);
-        jj_consume_token(OPEN_BOX);
-        identifierConstantAndVariableList();
-        jj_consume_token(CLOSE_BOX);
-        jj_consume_token(DOT);
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case ALL:{
+          jj_consume_token(ALL);
+          jj_consume_token(THIS);
+          addRule("#21", null);
+          jj_consume_token(OPEN_BOX);
+          identifierConstantAndVariableList();
+          jj_consume_token(CLOSE_BOX);
+          jj_consume_token(DOT);
+          break;
+          }
+        case THIS:{
+          jj_consume_token(THIS);
+          addRule("#22", null);
+          jj_consume_token(OPEN_BOX);
+          identifierConstantAndVariableList();
+          jj_consume_token(CLOSE_BOX);
+          jj_consume_token(DOT);
+          break;
+          }
+        default:
+          jj_la1[30] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
       } catch (ParseException e) {
-output.add(new ErrorStruct("Invalid write all command declaration", e));
+output.add(new ErrorStruct("Invalid write command declaration", e));
         consumeUntil(g, e);
         validSyntax = false;
       }
     } finally {
-      trace_return("writeAll");
+      trace_return("writeOne");
     }
   }
 
@@ -1459,7 +1481,7 @@ output.add(new ErrorStruct("Invalid read command declaration", e));
     trace_call("commandList");
     try {RecoverySet g = First.commandList;
       try {
-        label_13:
+        label_11:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case REPEAT:{
@@ -1471,21 +1493,7 @@ output.add(new ErrorStruct("Invalid read command declaration", e));
             break;
             }
           case WRITE:{
-            jj_consume_token(WRITE);
-            switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-            case THIS:{
-              write(g);
-              break;
-              }
-            case ALL:{
-              writeAll(g);
-              break;
-              }
-            default:
-              jj_la1[28] = jj_gen;
-              jj_consume_token(-1);
-              throw new ParseException();
-            }
+            write(g);
             break;
             }
           case DESIGNATE:{
@@ -1497,7 +1505,7 @@ output.add(new ErrorStruct("Invalid read command declaration", e));
             break;
             }
           default:
-            jj_la1[29] = jj_gen;
+            jj_la1[31] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -1511,8 +1519,8 @@ output.add(new ErrorStruct("Invalid read command declaration", e));
             break;
             }
           default:
-            jj_la1[30] = jj_gen;
-            break label_13;
+            jj_la1[32] = jj_gen;
+            break label_11;
           }
         }
       } catch (ParseException e) {
@@ -1554,7 +1562,7 @@ output.add(new ErrorStruct("Invalid body declaration", e));
           break;
           }
         default:
-          jj_la1[31] = jj_gen;
+          jj_la1[33] = jj_gen;
           ;
         }
       } catch (ParseException e) {
@@ -1598,7 +1606,7 @@ consumeUntil(r, e);
           break;
           }
         default:
-          jj_la1[32] = jj_gen;
+          jj_la1[34] = jj_gen;
           ;
         }
         jj_consume_token(0);
@@ -1615,7 +1623,7 @@ output.add(new ErrorStruct("Invalid general form of the program", e));
   final public void lexicalAnalyzer() throws ParseException {
     trace_call("lexicalAnalyzer");
     try {
-      label_14:
+      label_12:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case DO:
@@ -1681,8 +1689,8 @@ output.add(new ErrorStruct("Invalid general form of the program", e));
           break;
           }
         default:
-          jj_la1[33] = jj_gen;
-          break label_14;
+          jj_la1[35] = jj_gen;
+          break label_12;
         }
         lexer();
       }
@@ -1993,7 +2001,7 @@ concatError(t, "Unidentified Token"); validLexical = false;
           break;
           }
         default:
-          jj_la1[34] = jj_gen;
+          jj_la1[36] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -2014,7 +2022,7 @@ concatError(t, "Unidentified Token"); validLexical = false;
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[35];
+  final private int[] jj_la1 = new int[37];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -2024,13 +2032,13 @@ concatError(t, "Unidentified Token"); validLexical = false;
       jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x0,0x10080000,0x0,0x0,0x0,0x0,0x0,0x0,0x40700000,0x0,0x0,0x0,0x0,0x4000,0x4000,0x18000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x30000,0x87000000,0x87000000,0x0,0x1000,0xfffff000,0xfffff000,};
+      jj_la1_0 = new int[] {0x0,0x10080000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x40700000,0x0,0x0,0x0,0x4000,0x4000,0x18000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x30000,0x87000000,0x87000000,0x0,0x1000,0xfffff000,0xfffff000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x2,0x0,0x40000000,0x10000000,0x400000,0x40000000,0x10000000,0x10000000,0x40000000,0x40000000,0x0,0x40000000,0x40000000,0x0,0x0,0x0,0x10000000,0x0,0x0,0x3e8000,0x3e8000,0x44000098,0x4000,0x3c40,0x3c40,0x120,0x120,0x18,0x0,0x4,0x4,0x1,0x0,0xffffffff,0xffffffff,};
+      jj_la1_1 = new int[] {0x2,0x0,0x2,0x40000000,0x10000000,0x400000,0x40000000,0x10000000,0x10000000,0x40000000,0x40000000,0x0,0x40000000,0x0,0x0,0x0,0x10000000,0x0,0x0,0x3e8000,0x3e8000,0x44000098,0x4000,0x3c40,0x3c40,0x120,0x120,0x18,0x10,0x8,0x0,0x4,0x4,0x1,0x0,0xffffffff,0xffffffff,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x31,0x0,0x0,0x0,0x0,0x31,0x0,0x0,0x0,0x0,0x0,0x0,0x31,0x30,0x0,0x0,0x31,0x0,0x0,0x0,0x400,0x400,0x0,0x0,0x0,0x0,0x0,0x0,0x20f9,0x20f9,};
+      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x31,0x0,0x0,0x0,0x0,0x31,0x0,0x0,0x0,0x0,0x0,0x31,0x30,0x0,0x0,0x31,0x0,0x0,0x0,0x400,0x400,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x20f9,0x20f9,};
    }
 
   /** Constructor with InputStream. */
@@ -2044,7 +2052,7 @@ concatError(t, "Unidentified Token"); validLexical = false;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 35; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -2058,7 +2066,7 @@ concatError(t, "Unidentified Token"); validLexical = false;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 35; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -2068,7 +2076,7 @@ concatError(t, "Unidentified Token"); validLexical = false;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 35; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -2078,7 +2086,7 @@ concatError(t, "Unidentified Token"); validLexical = false;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 35; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -2087,7 +2095,7 @@ concatError(t, "Unidentified Token"); validLexical = false;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 35; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -2096,7 +2104,7 @@ concatError(t, "Unidentified Token"); validLexical = false;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 35; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 37; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -2154,7 +2162,7 @@ concatError(t, "Unidentified Token"); validLexical = false;
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 35; i++) {
+    for (int i = 0; i < 37; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

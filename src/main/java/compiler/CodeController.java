@@ -4,16 +4,20 @@ import parser.*;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import virtualMachine.VirtualMachine;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 
 public class CodeController {
     public LangParser LangParser;
     private String code;
     private String fileName;
     private File file;
+
+    private List<Instruction> instructionTable;
 
     Clipboard clipboard = Clipboard.getSystemClipboard();
 
@@ -143,7 +147,14 @@ public class CodeController {
         codeTextArea.setText("");
     }
 
-    void compile(TextArea code, TextArea consoleTextArea, CompilerApplication screen) {
+    void run(CompilerApplication screen){
+        screen.eraseRuntimeInput();
+        VirtualMachine virtualMachine = new VirtualMachine(screen);
+        virtualMachine.reset();
+        virtualMachine.run(this.instructionTable);
+    }
+
+    boolean compile(TextArea code, TextArea consoleTextArea, CompilerApplication screen) {
         LangParser parser = null;
         try {
             parser = new LangParser(new ByteArrayInputStream(code.getText().getBytes()));
@@ -155,13 +166,16 @@ public class CodeController {
                 parser.syntaxAnalyzer();
                 if (parser.isValidSyntax()) {
                     if(parser.isValidSemantic()){
+                        this.instructionTable = parser.getSemanticInstructions();
                         consoleTextArea.appendText("The code was compiled successfully\n");
                         screen.openTable(parser.getSemanticInstructions());
+                        return true;
                     } else {
                         consoleTextArea.appendText("Found semantic errors:\n");
                         for (String err : parser.getSemanticErrors()) {
                             consoleTextArea.appendText(err + "\n");
                         }
+                        return false;
                     }
                 } else {
                     consoleTextArea.appendText("Found " + parser.getOutput().size() + " syntactic errors:\n");
@@ -169,16 +183,18 @@ public class CodeController {
                         consoleTextArea.appendText("Error: " + err.getMsg() + " located at [line:" + err.getError().currentToken.beginLine + "| column: "
                                 + err.getError().currentToken.endColumn + "] expected:" + err.expected() + "\n");
                     }
+                    return false;
                 }
             } else {
                 consoleTextArea.appendText("Found lexical errors:\n");
                 consoleTextArea.setText(consoleTextArea.getText() + parser.getResult());
+                return false;
 
             }
         } catch (ParseException e) {
             consoleTextArea.setText(consoleTextArea.getText() + parser.getResult() + e.getMessage());
+            return false;
         }
-
     }
 
 

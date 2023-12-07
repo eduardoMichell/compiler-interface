@@ -1,4 +1,7 @@
 package compiler;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import parser.ParseException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -18,10 +21,8 @@ import java.io.*;
 import java.net.URL;
 import java.util.*;
 
-public class CompilerController  implements Initializable {
-
+public class CompilerController implements Initializable {
     private int archivesSize = 1;
-
     CompilerApplication screen;
 
     @FXML
@@ -83,25 +84,34 @@ public class CompilerController  implements Initializable {
         this.screen.autoResizeSplitPaneWidth(splitPane, lineColumnText);
         this.screen.autoResizeSplitPaneHeight(splitPane, lineColumnText);
         this.screen.setLineAndColumn(codeTextArea, lineColumnText);
-
-
         this.screen.defineSplitPane(codeTextArea, consoleTextArea, splitPane);
+
+        codeTextArea.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                screen.closeAll();
+                stop.setDisable(true);
+                run.setDisable(true);
+
+            }
+        });
 
     }
 
     @FXML
     void onCodeAreaKeyPressed(KeyEvent event) {
-        this.codeController.setCode(this.codeTextArea.getText()+event.getText());
+        this.codeController.setCode(this.codeTextArea.getText() + event.getText());
         this.codeController.setFileEdited(true);
         this.screen.updateTitle(this.codeController.getFileName() + "*");
     }
+
     @FXML
     void onClickNewFile(ActionEvent event) {
         this.newFile();
     }
 
-    void newFile(){
-        if(!this.codeController.isFileEdited()) {
+    void newFile() {
+        if (!this.codeController.isFileEdited()) {
             this.codeTextArea.setText("");
             this.codeController.newFile(this.archivesSize);
             this.archivesSize++;
@@ -110,7 +120,7 @@ public class CompilerController  implements Initializable {
             this.disableIDE(false);
         } else {
             this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
-            if(!this.codeController.isFileEdited()){
+            if (!this.codeController.isFileEdited()) {
                 this.codeTextArea.setText("");
                 this.codeController.newFile(this.archivesSize);
                 this.archivesSize++;
@@ -131,12 +141,12 @@ public class CompilerController  implements Initializable {
             this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
         }
         this.codeController.openFile(codeTextArea, screen);
-        if(this.codeController.getFile() != null){
+        if (this.codeController.getFile() != null) {
             this.disableIDE(false);
         }
     }
 
-    void disableIDE(boolean variable){
+    void disableIDE(boolean variable) {
         this.codeTextArea.setDisable(variable);
         this.cutText.setDisable(variable);
         this.copyText.setDisable(variable);
@@ -145,7 +155,7 @@ public class CompilerController  implements Initializable {
         this.saveFile.setDisable(variable);
     }
 
-    void eraseAll(){
+    void eraseAll() {
         this.codeController.setFile(null);
         this.codeController.setFileName("");
         this.codeController.setCode("");
@@ -156,24 +166,25 @@ public class CompilerController  implements Initializable {
         this.screen.updateTitle("");
     }
 
-    void cancelSaveFile(){
-      this.eraseAll();
+    void cancelSaveFile() {
+        this.eraseAll();
     }
 
     void saveFile() throws IOException {
-        if(this.codeController.isFileEdited()) {
-            if(this.codeController.getFile() != null){
+        if (this.codeController.isFileEdited()) {
+            if (this.codeController.getFile() != null) {
                 this.codeController.saveFile(this.codeTextArea.getText(), this.codeController.getFile());
                 this.screen.updateTitle(this.codeController.getFileName());
             } else {
                 File newFile = screen.chooseFilePath("Save As", this.codeController.getFileName());
-                if(newFile != null) {
+                if (newFile != null) {
                     this.codeController.saveFile(this.codeTextArea.getText(), newFile);
                     this.screen.updateTitle(newFile.getName());
                 }
             }
         }
     }
+
     @FXML
     void onClickSaveFile(ActionEvent event) throws IOException {
         this.saveFile();
@@ -197,36 +208,51 @@ public class CompilerController  implements Initializable {
     @FXML
     void onClickCompile(ActionEvent event) throws ParseException {
         this.consoleTextArea.setText("");
-        this.codeController.compile(this.codeTextArea, consoleTextArea, screen);
-    }
+        this.run.setDisable(true);
+        this.stop.setDisable(true);
+        this.screen.closeRuntimeStage();
+        this.screen.closeTableStage();
+        this.screen.clearRuntime();
+        boolean compiled = this.codeController.compile(this.codeTextArea, consoleTextArea, screen);
+        if (compiled) {
+            this.run.setDisable(false);
 
+        }
+    }
 
     @FXML
     void onClickRun(ActionEvent event) {
-
+        this.stop.setDisable(false);
+        this.screen.closeRuntimeStage();
+        this.screen.clearRuntime();
+        this.screen.openRuntime(this);
+        this.codeController.run(screen);
     }
 
     @FXML
     void onClickStop(ActionEvent event) {
+        this.screen.stop();
+        this.stop.setDisable(true);
     }
 
     @FXML
     void menuBarFileNewOnClick(ActionEvent event) {
         this.newFile();
     }
-      @FXML
+
+    @FXML
     void menuBarFileOpenOnClick(ActionEvent event) throws IOException {
-          if(!this.codeController.isFileEdited()) {
-              this.openFile();
-          } else {
-              this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
-              this.openFile();
-          }
+        if (!this.codeController.isFileEdited()) {
+            this.openFile();
+        } else {
+            this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
+            this.openFile();
+        }
     }
 
     @FXML
     void menuBarFileCloseOnClick(ActionEvent event) {
-        if(!this.codeController.isFileEdited()) {
+        if (!this.codeController.isFileEdited()) {
             this.eraseAll();
         } else {
             this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
@@ -238,10 +264,11 @@ public class CompilerController  implements Initializable {
     void menuBarFileSaveOnClick(ActionEvent event) throws IOException {
         this.saveFile();
     }
+
     @FXML
     void menuBarSaveAsNewOnClick(ActionEvent event) throws IOException {
         File newFile = screen.chooseFilePath("Save As", this.codeController.getFileName());
-        if(newFile != null) {
+        if (newFile != null) {
             this.codeController.saveFile(this.codeTextArea.getText(), newFile);
             this.screen.updateTitle(newFile.getName());
         }
@@ -250,8 +277,8 @@ public class CompilerController  implements Initializable {
 
     @FXML
     void menuBarFileExitOnClick(ActionEvent event) {
-        if(!this.codeController.isFileEdited()) {
-           Platform.exit();
+        if (!this.codeController.isFileEdited()) {
+            Platform.exit();
         } else {
             this.screen.saveFile(this.codeController.getFileName(), this.codeTextArea.getText(), this.codeController, this);
         }
@@ -290,6 +317,9 @@ public class CompilerController  implements Initializable {
     @FXML
     void menuBarCompileOnClick(ActionEvent event) {
         this.consoleTextArea.setText("");
+        this.screen.closeRuntimeStage();
+        this.screen.closeTableStage();
+        this.screen.clearRuntime();
         this.codeController.compile(this.codeTextArea, consoleTextArea, screen);
     }
 
@@ -297,9 +327,14 @@ public class CompilerController  implements Initializable {
     void menuBarRunOnClick(ActionEvent event) {
         System.out.println("Clicou em executar");
     }
+
     @FXML
     void menuBarStopOnClick(ActionEvent event) {
         System.out.println("Clicou em parar execução");
+    }
+
+    void disableStopButton() {
+        this.stop.setDisable(true);
     }
 
     private void setImages() {

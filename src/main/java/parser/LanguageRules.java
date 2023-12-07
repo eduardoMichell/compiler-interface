@@ -150,9 +150,14 @@ public class LanguageRules {
 
     public void unstackLastInstructionAndUpdate() {
         String lastOfStack = unstack();
+        System.out.println("AQUI");
         for (Instruction instruction : instructionStack) {
             if (instruction.getPointer() == Integer.parseInt(lastOfStack)) {
+                System.out.println("ponteiro da instrucao: " + instruction.getPointer() + instruction.getAddress() + instruction.getCode());
+                System.out.println("ponteiro da last of stack: " + Integer.parseInt(lastOfStack));
+                System.out.println("instruction address: " + instruction.getAddress());
                 instruction.setAddress(String.valueOf(pointer + 1));
+                System.out.println("instruction address: " + instruction.getAddress());
                 break;
             }
         }
@@ -162,11 +167,13 @@ public class LanguageRules {
     public void rule1(Token token) {
         String identifier = token.image;
         symbolTable.add(new Symbol(identifier, "0", "-", "-"));
+        System.out.println("regra 1");
         printInstructions();
     }
 
     public void rule2() {
         instructionStack.add(new Instruction(pointer, "STP", "0"));
+        System.out.println("regra 2");
         printInstructions();
     }
 
@@ -179,6 +186,7 @@ public class LanguageRules {
             this.identifierRule3 = token;
             this.enumSymbolTable.add(enumIdentifier);
         }
+        System.out.println("regra 3");
         printInstructions();
     }
 
@@ -189,6 +197,7 @@ public class LanguageRules {
         } else {
             insertInstructionInEnumIdentifier(this.identifierRule3.image, identifier);
         }
+        System.out.println("regra 4");
         printInstructions();
     }
 
@@ -196,6 +205,7 @@ public class LanguageRules {
         context = AS_CONSTANT;
         VI = 0;
         TVI = 0;
+        System.out.println("regra 5");
         printInstructions();
     }
 
@@ -234,6 +244,7 @@ public class LanguageRules {
             VT = 0;
             TVI = 0;
         }
+        System.out.println("regra 6");
         printInstructions();
     }
 
@@ -259,11 +270,13 @@ public class LanguageRules {
         instructionStack.add(new Instruction(pointer, "STC", VP.toString()));
         pointer += 1;
         VP = 0;
+        System.out.println("regra 7");
         printInstructions();
     }
 
     public void rule8() {
         context = AS_VARIABLE;
+        System.out.println("regra 8");
         printInstructions();
     }
 
@@ -276,6 +289,7 @@ public class LanguageRules {
             VP += 1;
             symbolTable.add(new Symbol(identifier, "?", VT.toString(), "-"));
         }
+        System.out.println("regra 9");
         printInstructions();
     }
 
@@ -293,6 +307,7 @@ public class LanguageRules {
             indexedVariable = false;
             identifierRule10 = token;
         }
+        System.out.println("regra 10");
         printInstructions();
     }
 
@@ -321,6 +336,7 @@ public class LanguageRules {
                 }
                 break;
             case ASSIGNMENT:
+                System.out.println("'E AQUI" + identifierRule10.image + " " + isSymbolPresent(identifierRule10.image) + " + " + objIdentifierRule10.getCategory());
                 if (isSymbolPresent(identifierRule10.image) &&
                         (objIdentifierRule10.getCategory().equals("1")
                                 || objIdentifierRule10.getCategory().equals("2")
@@ -379,13 +395,17 @@ public class LanguageRules {
         }
 
 
+        System.out.println("regra 11");
         printInstructions();
     }
 
     public void rule12(Token token) {
         String identifier = token.image;
+
         integerConstant12 = Integer.parseInt(identifier);
         indexedVariable = true;
+        System.out.println(" ACHOU UMA  COM INDEX " + integerConstant12);
+        System.out.println("regra 12");
         printInstructions();
     }
 
@@ -395,6 +415,7 @@ public class LanguageRules {
         } else {
             type = 5;
         }
+        System.out.println("regra 13");
         printInstructions();
     }
 
@@ -404,6 +425,7 @@ public class LanguageRules {
         } else {
             type = 6;
         }
+        System.out.println("regra 14");
         printInstructions();
     }
 
@@ -413,6 +435,7 @@ public class LanguageRules {
         } else {
             type = 7;
         }
+        System.out.println("regra 15");
         printInstructions();
     }
 
@@ -423,6 +446,7 @@ public class LanguageRules {
             error.add("Error: Invalid type for constant");
             haveError = true;
         }
+        System.out.println("regra 16");
         printInstructions();
     }
 
@@ -433,11 +457,14 @@ public class LanguageRules {
             error.add("Error: Invalid type for constant");
             haveError = true;
         }
+        System.out.println("regra 17");
         printInstructions();
     }
 
     public void rule18() {
         context = ASSIGNMENT;
+        System.out.println("regra 18");
+
     }
 
     public void rule19() {
@@ -446,27 +473,32 @@ public class LanguageRules {
             pointer += 1;
         }
         attributeList = new ArrayList<>();
+        System.out.println("regra 19");
         printInstructions();
     }
 
     public void rule20() {
         context = INPUT;
+        System.out.println("regra 20");
         printInstructions();
     }
 
     public void rule21() {
-        context = WRITE_ALL_THIS;
+        output = WRITE_ALL_THIS;
+        System.out.println("regra 21");
         printInstructions();
     }
 
     public void rule22() {
-        context = WRITE_THIS;
+        output = WRITE_THIS;
+        System.out.println("regra 22");
         printInstructions();
     }
 
     public void rule23() {
         instructionStack.add(new Instruction(pointer, "WRT", "0"));
         pointer = pointer + 1;
+        System.out.println("regra 23");
         printInstructions();
     }
 
@@ -480,6 +512,7 @@ public class LanguageRules {
             this.identifierRule24Error = token;
             this.addError(token, "Undeclared identifier or program identifier or enumerated type");
         }
+        System.out.println("regra 24");
         printInstructions();
     }
 
@@ -519,6 +552,7 @@ public class LanguageRules {
             }
         }
 
+        System.out.println("regra 25");
         printInstructions();
     }
 
@@ -526,6 +560,7 @@ public class LanguageRules {
         String identifier = token.image;
         instructionStack.add(new Instruction(pointer, "LDI", identifier));
         pointer = pointer + 1;
+        System.out.println("regra 26");
         printInstructions();
     }
 
@@ -533,6 +568,7 @@ public class LanguageRules {
         String identifier = token.image;
         instructionStack.add(new Instruction(pointer, "LDR", identifier));
         pointer = pointer + 1;
+        System.out.println("regra 27");
         printInstructions();
     }
 
@@ -540,6 +576,7 @@ public class LanguageRules {
         String identifier = token.image;
         instructionStack.add(new Instruction(pointer, "LDS", identifier));
         pointer = pointer + 1;
+        System.out.println("regra 28");
         printInstructions();
     }
 
@@ -553,6 +590,7 @@ public class LanguageRules {
                 }
             }
         }
+        System.out.println("regra 29");
         printInstructions();
     }
 
@@ -560,6 +598,7 @@ public class LanguageRules {
         instructionStack.add(new Instruction(pointer, "JMF", "?"));
         stack(pointer.toString());
         pointer += 1;
+        System.out.println("regra 30");
         printInstructions();
     }
 
@@ -567,6 +606,7 @@ public class LanguageRules {
         instructionStack.add(new Instruction(pointer, "JMT", "?"));
         stack(pointer.toString());
         pointer += 1;
+        System.out.println("regra 31");
         printInstructions();
     }
 
@@ -575,116 +615,136 @@ public class LanguageRules {
         instructionStack.add(new Instruction(pointer, "JMP", "?"));
         stack(pointer.toString());
         pointer += 1;
+        System.out.println("regra 32");
         printInstructions();
     }
 
     public void rule33() {
         stack(pointer.toString());
+        System.out.println("regra 33");
         printInstructions();
     }
 
     public void rule34() {
         instructionStack.add(new Instruction(pointer, "JMF", "?"));
-        stack(pointer.toString());
         pointer += 1;
+        int pointerAux = pointer - 1;
+        stack(Integer.toString(pointerAux));
+        System.out.println("regra 34");
         printInstructions();
     }
 
     public void rule35() {
         unstackLastInstructionAndUpdate();
         String lastOfStack33 = unstack();
-        instructionStack.add(new Instruction(pointer, "JMF", lastOfStack33));
+        instructionStack.add(new Instruction(pointer, "JMP", lastOfStack33));
         pointer += 1;
+        System.out.println("regra 35");
         printInstructions();
     }
 
     public void rule36() {
         instructionStack.add(new Instruction(pointer, "EQL", "0")); // ==
         pointer = pointer + 1;
+        System.out.println("regra 36");
         printInstructions();
     }
 
     public void rule37() {
         instructionStack.add(new Instruction(pointer, "DIF", "0")); // !=
         pointer = pointer + 1;
+        System.out.println("regra 37");
         printInstructions();
     }
 
     public void rule38() {
         instructionStack.add(new Instruction(pointer, "SMR", "0")); // <<
         pointer = pointer + 1;
+        System.out.println("regra 38");
         printInstructions();
     }
 
     public void rule39() {
         instructionStack.add(new Instruction(pointer, "BGR", "0")); // >>
         pointer = pointer + 1;
+        System.out.println("regra 39");
         printInstructions();
     }
 
     public void rule40() {
         instructionStack.add(new Instruction(pointer, "SME", "0")); // <<=
         pointer = pointer + 1;
+        System.out.println("regra 40");
         printInstructions();
     }
 
     public void rule41() {
         instructionStack.add(new Instruction(pointer, "BGE", "0")); // >>=
         pointer = pointer + 1;
+        System.out.println("regra 41");
         printInstructions();
     }
 
     public void rule42() {
         instructionStack.add(new Instruction(pointer, "ADD", "0")); // +
         pointer = pointer + 1;
+        System.out.println("regra 42");
         printInstructions();
     }
 
     public void rule43() {
         instructionStack.add(new Instruction(pointer, "SUB", "0")); // -
         pointer = pointer + 1;
+        System.out.println("regra 43");
         printInstructions();
     }
 
     public void rule44() {
         instructionStack.add(new Instruction(pointer, "OR", "0")); // |
         pointer = pointer + 1;
+        System.out.println("regra 44");
         printInstructions();
     }
 
     public void rule45() {
         instructionStack.add(new Instruction(pointer, "MUL", "0")); // *
         pointer = pointer + 1;
+        System.out.println("regra 45");
         printInstructions();
     }
 
     public void rule46() {
         instructionStack.add(new Instruction(pointer, "DIV", "0")); // /
         pointer = pointer + 1;
+        System.out.println("regra 46");
         printInstructions();
     }
 
     public void rule47() {
         instructionStack.add(new Instruction(pointer, "DVD", "0")); // %
         pointer = pointer + 1;
+        System.out.println("regra 47");
         printInstructions();
     }
 
     public void rule48() {
         instructionStack.add(new Instruction(pointer, "MOD", "0")); // %%
         pointer = pointer + 1;
+        System.out.println("regra 48");
         printInstructions();
     }
 
     public void rule49() {
         instructionStack.add(new Instruction(pointer, "AND", "0")); // &
         pointer = pointer + 1;
+        System.out.println("regra 49");
         printInstructions();
     }
 
     public void rule50() {
         instructionStack.add(new Instruction(pointer, "POW", "0")); // **
         pointer = pointer + 1;
+        System.out.println("regra 50");
         printInstructions();
     }
 
@@ -693,6 +753,8 @@ public class LanguageRules {
         if (!haveError) {
             if (!indexedVariable) {
                 if (objIdentifierRule24 != null && objIdentifierRule24.getAttrTwo().equals("-")) {
+                    System.out.println("atributo kkkkk " +  objIdentifierRule24.getAttrOne());
+
                     instructionStack.add(new Instruction(pointer, "LDV", objIdentifierRule24.getAttrOne()));
                     pointer = pointer + 1;
                 } else {
@@ -708,24 +770,28 @@ public class LanguageRules {
                 }
             }
         }
+        System.out.println("regra 51");
         printInstructions();
     }
 
     public void rule52() {
         instructionStack.add(new Instruction(pointer, "LDB", "true"));
         pointer = pointer + 1;
+        System.out.println("regra 52");
         printInstructions();
     }
 
     public void rule53() {
         instructionStack.add(new Instruction(pointer, "LDB", "false"));
         pointer = pointer + 1;
+        System.out.println("regra 53");
         printInstructions();
     }
 
     public void rule54() {
         instructionStack.add(new Instruction(pointer, "NOT", "0"));
         pointer = pointer + 1;
+        System.out.println("regra 54");
         printInstructions();
     }
 
@@ -753,6 +819,7 @@ public class LanguageRules {
         System.out.println("vp:" + VP);
         System.out.println("vI:" + VI);
         System.out.println("vt:" + VT);
+        System.out.println("tvi:" + TVI);
         System.out.println("type:" + type);
         System.out.println("Instruction Stack: ");
         for (Instruction inst : instructionStack) {
@@ -761,6 +828,11 @@ public class LanguageRules {
         System.out.println("Symbol Table: ");
         for (Symbol symbol : symbolTable) {
             System.out.println(symbol.getIdentifier() + ", " + symbol.getCategory() + ", " + symbol.getAttrOne() + ", " + symbol.getAttrTwo());
+        }
+
+        System.out.println("Stack Table: ");
+        for (String string : deviationStack) {
+            System.out.println(string + ", ");
         }
         if (haveError) {
             System.out.println("Errors: ");

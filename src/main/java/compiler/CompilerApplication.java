@@ -1,69 +1,135 @@
 package compiler;
 
 import javafx.application.Application;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import parser.Instruction;
 
 import java.io.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
+import java.util.concurrent.CompletableFuture;
 
 public class CompilerApplication extends Application {
-
     FileChooser fileChooser = new FileChooser();
     private static CompilerApplication instance;
+    private File lastDirectory;
+    private Stage compilerStage;
+    private String lastInput;
+    TextArea runtime = new TextArea();
+    TextField inputRuntime;
+    Stage tableStage;
+    Stage runtimeStage;
+    private CompletableFuture<String> inputFuture;
+
+    @Override
+    public void start(Stage stage) throws IOException {
+        instance = this;
+        this.compilerStage = stage;
+        FXMLLoader fxmlLoader = new FXMLLoader(CompilerApplication.class.getResource("compiler-interface-view.fxml"));
+
+        Scene scene = new Scene(fxmlLoader.load(), 1800, 850);
+        stage.setMaximized(true);
+        stage.setMinWidth(550);
+        stage.setMinHeight(690);
+        stage.setTitle("Compiler");
+        stage.setScene(scene);
+        stage.show();
+    }
 
     public static CompilerApplication getInstance() {
         return instance;
     }
 
-    private File lastDirectory;
-    private Stage stage;
+    public void openRuntime(CompilerController controller) {
+        this.runtimeStage = new Stage();
 
-    @Override
-    public void start(Stage stage) throws IOException {
-        instance = this;
-        this.stage = stage;
-        FXMLLoader fxmlLoader = new FXMLLoader(CompilerApplication.class.getResource("compiler-interface-view.fxml"));
+        this.runtimeStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                controller.disableStopButton();
+            }
+        });
 
-        Scene scene = new Scene(fxmlLoader.load(), 1800, 850);
+        VBox vBox = new VBox();
+        runtime.setEditable(false);
+        VBox.setVgrow(runtime, Priority.ALWAYS);
 
-        stage.setMaximized(true);
-        stage.setMinWidth(550);
-        stage.setMinHeight(690);
+        inputRuntime = new TextField();
+        inputRuntime.setDisable(false);
+        inputRuntime.setOnKeyReleased(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                inputFuture.complete(inputRuntime.getText());
+            }
+        });
 
-        stage.setTitle("Compilador");
-        stage.setScene(scene);
-        stage.show();
+        inputRuntime.setPrefHeight(60);
+        vBox.getChildren().addAll(runtime, inputRuntime);
+        Scene runtimeScene = new Scene(vBox, 300, 220);
+        this.runtimeStage.setScene(runtimeScene);
+        this.runtimeStage.setTitle("Runtime");
+        this.runtimeStage.show();
     }
 
+
+    public void programStopped(){
+        inputFuture = new CompletableFuture<>();
+        inputFuture.complete("");
+        inputRuntime.clear();
+        inputRuntime.setDisable(true);
+    }
+    public void eraseInputRuntime() {
+        inputRuntime.clear();
+    }
+
+    private CompletableFuture<String> readInputAsync() {
+        inputFuture = new CompletableFuture<>();
+        Platform.runLater(() -> {
+            inputRuntime.requestFocus();
+        });
+        return inputFuture;
+    }
+
+    public CompletableFuture<String> getInputAsync() {
+        return readInputAsync();
+    }
+
+    public String getLastInput() {
+        return lastInput;
+    }
+
+    public void setLastInput(String lastInput) {
+        this.lastInput = lastInput;
+    }
+
+    public void appendToRuntimeTerminal(String text) {
+        runtime.appendText(text + "\n");
+    }
+
+    public void eraseRuntimeInput() {
+        runtime.setText("");
+    }
 
     public void setLineAndColumn(TextArea codeTextArea, Text lineColumnText) {
         codeTextArea.caretPositionProperty().addListener((observable, oldValue, newValue) -> {
             int caretPosition = newValue.intValue();
             if (caretPosition > 0) {
-
                 String text = codeTextArea.getText();
                 int currentLine = 1;
                 int currentColumn = 1;
-
                 if (caretPosition <= text.length()) {
                     int lineStart = text.lastIndexOf('\n', caretPosition - 1) + 1;
                     currentColumn = caretPosition - lineStart + 1;
@@ -80,11 +146,41 @@ public class CompilerApplication extends Application {
         });
     }
 
+    public void clearRuntime() {
+        if(this.inputRuntime != null  && this.runtime != null) {
+            this.inputRuntime.setText("");
+            this.runtime.setText("");
+        }
+    }
+
+    public void stop() {
+        this.closeRuntimeStage();
+        this.clearRuntime();
+    }
+
+    public void closeAll(){
+        this.closeRuntimeStage();
+        this.closeTableStage();
+        this.clearRuntime();
+    }
+
+    public void closeRuntimeStage() {
+        if (this.runtimeStage != null) {
+            this.runtimeStage.close();
+        }
+    }
+
+    public void closeTableStage() {
+        if (this.tableStage != null) {
+            this.tableStage.close();
+        }
+    }
+
     public void updateTitle(String title) {
         if (Objects.equals(title, "")) {
-            stage.setTitle("Compilador");
+            compilerStage.setTitle("Compiler");
         } else {
-            stage.setTitle("Compilador - " + title);
+            compilerStage.setTitle("Compiler - " + title);
         }
     }
 
@@ -98,17 +194,17 @@ public class CompilerApplication extends Application {
     }
 
     public void autoResizeSplitPaneWidth(SplitPane splitPane, Text lineColumnText) {
-        stage.widthProperty().addListener((obs, oldWidth, newWidth) -> {
-            double newTextAreaWidth = stage.getWidth() - 38;
+        compilerStage.widthProperty().addListener((obs, oldWidth, newWidth) -> {
+            double newTextAreaWidth = compilerStage.getWidth() - 38;
             splitPane.setPrefWidth(newTextAreaWidth);
             lineColumnText.setLayoutX(10);
         });
     }
 
     public void autoResizeSplitPaneHeight(SplitPane splitPane, Text lineColumnText) {
-        stage.heightProperty().addListener((obs, oldHeight, newHeight) -> {
-            splitPane.setPrefHeight(stage.getHeight() - 160);
-            lineColumnText.setLayoutY(stage.getHeight() - 75);
+        compilerStage.heightProperty().addListener((obs, oldHeight, newHeight) -> {
+            splitPane.setPrefHeight(compilerStage.getHeight() - 160);
+            lineColumnText.setLayoutY(compilerStage.getHeight() - 75);
         });
     }
 
@@ -120,7 +216,7 @@ public class CompilerApplication extends Application {
         if (lastDirectory != null) {
             fileChooser.setInitialDirectory(lastDirectory);
         }
-        File file = fileChooser.showOpenDialog(stage);
+        File file = fileChooser.showOpenDialog(compilerStage);
         if (file != null) {
             lastDirectory = file.getParentFile();
         }
@@ -133,7 +229,7 @@ public class CompilerApplication extends Application {
                 new FileChooser.ExtensionFilter("Text Files", "*.txt")
         );
         fileChooser.setInitialFileName(!fileName.isEmpty() ? fileName : "");
-        return fileChooser.showSaveDialog(stage);
+        return fileChooser.showSaveDialog(compilerStage);
     }
 
     public void saveFile(String path, String code, CodeController controller, CompilerController compilerController) {
@@ -176,9 +272,8 @@ public class CompilerApplication extends Application {
     }
 
     public void openTable(List<Instruction> instructions) {
-        Stage newStage = new Stage();
-        newStage.initModality(Modality.APPLICATION_MODAL);
-        TableView<Instruction> table =  new TableView();
+        this.tableStage = new Stage();
+        TableView<Instruction> table = new TableView();
 
         TableColumn<Instruction, Integer> pointerColumn = new TableColumn<>("Pointer");
         pointerColumn.setCellValueFactory(new PropertyValueFactory<>("pointer"));
@@ -193,17 +288,15 @@ public class CompilerApplication extends Application {
 
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        for (Instruction inst : instructions){
+        for (Instruction inst : instructions) {
             table.getItems().add(inst);
         }
 
         Scene tableScene = new Scene(table, 300, 220);
-        newStage.setScene(tableScene);
-        newStage.setTitle("Object Code");
-        newStage.show();
+        this.tableStage.setScene(tableScene);
+        this.tableStage.setTitle("Object Code");
+        this.tableStage.show();
     }
-
-
 
     public static void main(String[] args) {
         launch();
